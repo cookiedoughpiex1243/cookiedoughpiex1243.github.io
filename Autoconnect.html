@@ -74,6 +74,13 @@
       border: none;
       border-radius: 30px;
     }
+    .backbuttonc {
+      text-align: center;
+      position: fixed;
+      margin-left: 50%
+      margin-top: auto;
+      margin-bottom: 20px;
+    }
     .back-button {
             display: inline-block;
             font-weight: 500;
@@ -98,7 +105,7 @@
 
     <div class="links-block">
       <p>Connect to my PC (Only 8MB, automatic :D)</p>
-      <p>If prompted by SmartScreen, click More info → Run Anyway (it's safe)</p>
+      <p>If prompted by SmartScreen, click More info → Run Anyway (Self-extracting package.)</p>
 
       <!-- each option is its own block, stacked vertically -->
       <a href="Autoconnect.exe" class="download-btn">
@@ -106,15 +113,16 @@
       </a><br>
 
       <a href="Autoconnect.zip" class="download-btn secondary">
-        Download zipped file and run manually if main file is providing errors.
+        Download zipped file and run manually if scared of security screen
       </a><br>
 
       <a href="manual-instructions.html" class="download-btn">
-        Instructions for manual download
+        Instructions for manual connection
       </a>
     </div>
-    <a href="index.html" class="back-button">Back</a>
   </div>
-  
+  <div class="backbuttonc">
+  <a href="index.html" class="back-button">Back</a>
+  </div>
 </body>
 </html>
