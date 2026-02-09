@@ -96,10 +96,41 @@
         .back-button:hover {
             filter: brightness(0.8);
         }
+    .boxoverlay {
+      top:0;
+      left:0;
+      background: rgba(0, 0, 0, 0.2)
+      backdrop-effect: blur(5px);
+      height: 100%;
+      width: 100%;
+      z-index:1000;
+      position:fixed;
+      display:none;
+    }
+    .box {
+      background: #0b0c10;
+      width:300px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      padding:20px;
+      text-align:center;
+      position:fixed;
+      marging:auto;
+      border:2px solid #00ffff;
+      border-radius:12px;
+    }
+    .closebtn {
+      color: #ff4444;
+      float: right;
+      font-size:28px;
+      font-weight:bold;
+      cursor:pointer;
+    }
   </style>
 </head>
 <body>
-  <img src="Cookie pfp 2.png" alt="logo" class="logo">
+  <img src="Cookie pfp 2.png" alt="logo" class="logo" onclick="closeBox()" style="cursor:pointer">
   <div class="wrapper">
     <h1 style="color: #00ffff;">Josh's site</h1>
     <img src="Cookie pfp 2.png" alt="Cookie" class="bigpfp">
@@ -120,6 +151,14 @@
       <a href="manual-instructions.html" class="download-btn">
         Instructions for manual connection
       </a>
+    </div>
+  </div>
+  <div id="myBox" class="boxoverlay">
+    <div class="box">
+      <span class="closebtn">&times;</span>
+      <h2 class="glow-cyan"> Extra Info</h2>
+      <p> YIPPEE you clicked the cookie!</p>
+      <button class="download-btn" onclick="closeBox()"> Cool, im done</button>
     </div>
   </div>
   <div class="backbuttonc">
