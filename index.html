@@ -31,8 +31,6 @@
     .bigpfp {
       border: 4px solid #00ffff;
     }
-
-    /* NEW: button-style links */
     .download-btn {
       display: inline-block;
       margin: 8px 0;
@@ -72,6 +70,37 @@
       height: 60px;
       border: 0px 0;
       border-radius: 30px;
+    }
+    .boxoverlay {
+      top:0;
+      left:0;
+      background: rgba(0, 0, 0, 0.2)
+      backdrop-effect: blur(5px);
+      height: 100%;
+      width: 100%;
+      z-index:1000;
+      position:fixed;
+      display:none;
+    }
+    .box {
+      background: #0b0c10;
+      width:300px;
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      padding:20px;
+      text-align:center;
+      position:fixed;
+      marging:auto;
+      border:2px solid #00ffff;
+      border-radius:12px;
+    }
+    .closebtn {
+      color: #ff4444;
+      float: right;
+      font-size:28px;
+      font-weight:bold;
+      cursor:pointer;
     }
   </style>
 </head>
