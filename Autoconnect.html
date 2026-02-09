@@ -100,7 +100,7 @@
       top:0;
       left:0;
       background: rgba(0, 0, 0, 0.2);
-      backdrop-effect: blur(5px);
+      backdrop-filter: blur(5px);
       height: 100%;
       width: 100%;
       z-index:1000;
@@ -129,7 +129,7 @@
   </style>
 </head>
 <body>
-  <img src="Cookie pfp 2.png" alt="logo" class="logo" onclick="closeBox()" style="cursor:pointer">
+  <img src="Cookie pfp 2.png" alt="logo" class="logo" onclick="openBox()" style="cursor:pointer">
   <div class="wrapper">
     <h1 style="color: #00ffff;">Josh's site</h1>
     <img src="Cookie pfp 2.png" alt="Cookie" class="bigpfp">
@@ -154,7 +154,7 @@
   </div>
   <div id="myBox" class="boxoverlay">
     <div class="box">
-      <span class="closebtn">&times;</span>
+      <span class="closebtn" onclick="closeBox()">&times;</span>
       <h2 class="glow-cyan"> Extra Info</h2>
       <p> YIPPEE you clicked the cookie!</p>
       <button class="download-btn" onclick="closeBox()"> Cool, im done</button>
@@ -163,5 +163,6 @@
   <div class="backbuttonc">
   <a href="index.html" class="back-button">Back</a>
   </div>
+  <script src="logobox.js" defer></script>
 </body>
 </html>
