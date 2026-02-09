@@ -93,6 +93,7 @@
       position:fixed;
       border:2px solid #00ffff;
       border-radius:12px;
+      animation: fadeInScale 0.3 ease-out forwards;
     }
     .closebtn {
       color: #ff4444;
@@ -100,6 +101,16 @@
       font-size:28px;
       font-weight:bold;
       cursor:pointer;
+    }
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
   </style>
 </head>
