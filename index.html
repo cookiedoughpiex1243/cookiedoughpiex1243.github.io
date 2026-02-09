@@ -74,8 +74,8 @@
     .boxoverlay {
       top:0;
       left:0;
-      background: rgba(0, 0, 0, 0.2)
-      backdrop-effect: blur(5px);
+      background: rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
       height: 100%;
       width: 100%;
       z-index:1000;
@@ -91,7 +91,6 @@
       padding:20px;
       text-align:center;
       position:fixed;
-      marging:auto;
       border:2px solid #00ffff;
       border-radius:12px;
     }
@@ -117,7 +116,7 @@
     </div>
   </div>
   <div id="myBox" class="boxoverlay">
-    <div class=box">
+    <div class="box">
       <span class="closebtn" onclick="closeBox()">&times;</span>
       <h2 class="glow-cyan"> Extra info</h2>
       <p>Yippee you clicked the cookie!</p>
