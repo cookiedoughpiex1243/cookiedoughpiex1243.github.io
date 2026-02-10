@@ -4,7 +4,7 @@ function injectOverlay() {
     
     <a href="login" 
     class="download-btn" 
-    style="top: 20px; z-index: 2000; right: 20px; padding: 10px; position: fixed; color: #00ffff; background: #0b0c10;">
+    style="top: 20px; z-index: 2000; right: 20px; padding: 10px; position: fixed; color: #00ffff; background: #0b0c10; width: auto;">
     Login
     </a>
     
