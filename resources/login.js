@@ -11,7 +11,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   const pass = document.getElementById('password');
   const message = document.getElementById('message');
   const correctHash = "7f7f0709a367503f56e0f3177651c518861d9a9f244199c0d12e86d26219842d";
-  const inputHash = await.hashPassword(pass.value);
+  const inputHash = await hashPassword(pass.value);
   if (user.value.toLowerCase() === "josh" && inputHash === correctHash) {
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
