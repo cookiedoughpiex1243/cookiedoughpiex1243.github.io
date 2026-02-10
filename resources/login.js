@@ -17,5 +17,5 @@ document.getElementById('loginbtn').addEventListener('click', function () {
 document.addEventListener('keypress', function (e) {
   if (e.key == 'Enter') {
     document.getElementById('loginbtn').click();
-  });
+  };
     
