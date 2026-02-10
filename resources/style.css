@@ -45,6 +45,7 @@
 
     .download-btn:hover {
       filter: brightness(0.8);
+      transform: scale(1.05);
     }
 
     .links-block {
