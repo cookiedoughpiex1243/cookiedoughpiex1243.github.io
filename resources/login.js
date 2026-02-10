@@ -1,8 +1,19 @@
-document.getElementById('loginbtn').addEventListener('click', function () {
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  // Convert bytes to hex string
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+document.getElementById('loginbtn').addEventListener('click', async function () {
   const user = document.getElementById('username');
   const pass = document.getElementById('password');
   const message = document.getElementById('message');
-  if (user.value.toLowerCase() === "josh" && pass.value === "347379") {
+  const correctHash = "7f7f0709a367503f56e0f3177651c518861d9a9f244199c0d12e86d26219842d";
+  const inputHash = await.hashPassword(pass.value);
+  if (user.value.toLowerCase() === "josh" && inputHash === correctHash) {
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     setTimeout (() => {
@@ -11,6 +22,7 @@ document.getElementById('loginbtn').addEventListener('click', function () {
   else {
     message.style.color = "red";
     message.innerText = " Nope, wrong login :("
+    pass.value = "";
   }
 });
 
