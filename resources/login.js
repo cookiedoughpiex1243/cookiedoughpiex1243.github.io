@@ -12,4 +12,9 @@ document.getElementById('loginbtn').addEventListener('click', function () {
     message.innerText = " Nope, wrong login :("
   }
 });
+
+document.addEventListener('keypress', function (e) {
+  if (e.key == 'Enter') {
+    document.getElementById('loginbtn').click();
+  });
     
