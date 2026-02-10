@@ -1,12 +1,14 @@
 function injectOverlay() {
-  OverlayHTML = '<div id="myBox" class="boxoverlay">
+  OverlayHTML = ` 
+    <div id="myBox" class="boxoverlay">
     <div class="box">
       <span class="closebtn" onclick="closeBox()">&times;</span>
       <h2 class="glow-cyan"> Extra Info</h2>
       <p> YIPPEE you clicked the cookie!</p>
       <button class="download-btn" onclick="closeBox()"> Cool, im done</button>
     </div>
-  </div>';
+  </div> `;
+  
 document.body.insertAdjacentHTML('beforeend', OverlayHTML)
 }
 
