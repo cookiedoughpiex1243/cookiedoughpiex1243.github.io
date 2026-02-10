@@ -1,5 +1,6 @@
 function injectOverlay() {
   OverlayHTML = ` 
+  <a href="login" class="download-btn" style="top: 20px; left: 20px;>Login</a>
     <div id="myBox" class="boxoverlay">
     <div class="box">
       <span class="closebtn" onclick="closeBox()">&times;</span>
