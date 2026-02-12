@@ -15,6 +15,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   if (user.value.toLowerCase() === "josh" && inputHash === correctHash) {
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
+    sessionStorage.setItem('loggedIn', 'true');
     setTimeout (() => {
       window.location.href = "loggedin"
       message.innerText = ""}, 1000);
