@@ -16,7 +16,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     setTimeout (() => {
-      window.location.href = "https://joyfoodsunshine.com/the-most-amazing-chocolate-chip-cookies"}, 1000);
+      window.location.href = "loggedin"}, 1000);
   }
   else {
     message.style.color = "red";
