@@ -12,6 +12,7 @@ function injectOverlay() {
       <span class="closebtn" onclick="closeBox()">&times;</span>
       <h2 class="glow-cyan"> Extra Info</h2>
       <p> YIPPEE you clicked the cookie!</p>
+      <p>RustDesk ID = <span class="code-highlight">376 999 988</span></p>
       <button class="download-btn" onclick="closeBox()"> Cool, im done</button>
     </div>
   </div> `;
