@@ -83,7 +83,7 @@
       left: 10px;
       width: 60px;
       height: 60px;
-      border: 0px 0;
+      border: 1px solid cyan;
       border-radius: 30px;
     }
     .boxoverlay {
