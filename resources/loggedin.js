@@ -5,7 +5,7 @@ else {
   window.location.replace("login");
 }
                        
-window.addEventListener('beforeunload', function () { //CHANGE TO A BEFORUNLOAD EVENT LISTENER IF ADDING MORE LOCKED PAGES
+window.addEventListener('beforeunload', function () {
   sessionStorage.removeItem('loggedIn');
 });
 
