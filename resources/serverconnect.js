@@ -3,7 +3,7 @@ async function getFromServer() {
   try {
     const response = await fetch(`${CLOUD_URL}/load`);
         const data = await response.json();
-        document.getElementById('userNote').value = data.message || "";
+        document.getElementById('userMsg').value = data.message || "";
     } catch (err) {
         console.error("Server is still waking up...", err);
     }
