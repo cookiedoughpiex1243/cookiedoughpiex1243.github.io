@@ -9,6 +9,7 @@ async function loadText() {
         const response = await fetch(`${CLOUD_URL}/load`);
         const data = await response.json();
 
+        // Use .message to match your save function
         inputField.value = data.message || "";
 
         if(displayDiv) {
@@ -16,30 +17,43 @@ async function loadText() {
         }
 
         status.innerText = "Loaded from cloud.";
+        status.style.color = "#39ff14"; // Make it green when successful
     } catch (err) {
         status.innerText = "Server is waking up... wait 50s.";
+        // Retry every 5 seconds until the server responds
         setTimeout(loadText, 5000);
     }
 }
 
-window.onload = loadText;
-
 async function saveToServer() {
+    const status = document.getElementById('status');
     const text = document.getElementById('userMsg').value;
-    await fetch(`${CLOUD_URL}/save`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
-    });
-    alert("Saved to server");
+    
+    status.innerText = "Saving...";
+    
+    try {
+        await fetch(`${CLOUD_URL}/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+        status.innerText = "Saved to server!";
+    } catch (err) {
+        status.innerText = "Save failed. Check connection.";
+    }
 }
 
-// 1. Save when the user clicks 'Enter' inside the input
-document.getElementById('userMsg').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        saveToServer();
-    }
-});
+// Ensure the page is fully loaded before attaching listeners
+window.addEventListener('DOMContentLoaded', () => {
+    loadText();
 
-// 2. OR Save when the user clicks away from the input (blur)
-document.getElementById('userMsg').addEventListener('blur', saveToServer);
+    const input = document.getElementById('userMsg');
+    
+    // Save on Enter key
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') saveToServer();
+    });
+
+    // Save when clicking away
+    input.addEventListener('blur', saveToServer);
+});
