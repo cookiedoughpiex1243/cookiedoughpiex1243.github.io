@@ -5,7 +5,3 @@ else {
   window.location.replace("login");
 }
                        
-window.addEventListener('beforeunload', function () {
-  sessionStorage.removeItem('loggedIn');
-});
-
