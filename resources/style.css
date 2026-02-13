@@ -68,6 +68,7 @@
     }
 
     .links-block {
+      display: flex;
       text-align: center;
       color: #00ffff;
       margin-top: 20px;
