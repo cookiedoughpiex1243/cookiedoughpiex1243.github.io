@@ -18,4 +18,4 @@ document.addEventListener('click', function(e) {
   if (e.target == lob) {
     sessionStorage.removeItem('loggedIn');
     window.location.replace("login");
-  })
+  });
