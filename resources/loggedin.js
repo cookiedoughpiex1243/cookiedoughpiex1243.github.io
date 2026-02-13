@@ -7,9 +7,15 @@ else {
                        
 function logoutbtn () {
   lobtn = `
-  <button class="back-button" style="bottom:20px; left:20px; cursor: pointer;">Logout</button>
+  <button class="back-button" id="logout" style="bottom:20px; left:20px; cursor: pointer;">Logout</button>
   `
-  document.body.insertAdjacentHtml('beforeend', lobtn);
+  document.body.insertAdjacentHTML('beforeend', lobtn);
 }
 
 logoutbtn();
+const lob = document.getElementById("logout");
+document.addEventListener('click', function(e) {
+  if (e.target == lob) {
+    sessionStorage.removeItem('loggedIn');
+    window.location.replace("login");
+  })
