@@ -11,3 +11,5 @@ function logoutbtn () {
   `
   document.body.insertAdjacentHtml('beforeend', lobtn);
 }
+
+logoutbtn();
