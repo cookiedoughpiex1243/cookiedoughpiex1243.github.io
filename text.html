@@ -2,16 +2,23 @@
 <html>
   <head>
     <link rel="stylesheet" href="resources/style.css">
-    <script src="resources/serverconnect.js"></script>
+    <script src="resources/serverconnect.js" defer></script>
     <title>Saved text</title>
     <meta charset="UTF-8">
   </head>
   <body>
     <div class="box">
       <h2 class="glow-cyan">Saved text</h2>
-      <input class="login-input" id="userMsg" type="text">
-      <br>
-      <input class="login-input" id="displayArea" type="text">
+      
+      <label style="color: cyan; font-size: 12px;">EDIT MESSAGE:</label>
+      <input class="login-input" id="userMsg" type="text" placeholder="Type here...">
+
+      <button class="login-button" onclick="saveToServer()" style="margin: 10px 0;">SAVE TO CLOUD</button>
+
+      <label style="color: cyan; font-size: 12px; margin-top: 10px;">CURRENTLY SAVED:</label>
+      <input class="login-input" id="displayArea" type="text" readonly style="border-style: dashed; opacity: 0.7;">
+
+      <p id="status" style="color: #00ffff; font-size: 12px; margin-top: 15px;">Connecting...</p>
     </div>
   </body>
 </html>
