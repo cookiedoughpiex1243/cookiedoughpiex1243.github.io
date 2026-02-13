@@ -38,6 +38,7 @@ async function saveToServer() {
             body: JSON.stringify({ message: text })
         });
         status.innerText = "Saved to server!";
+        loadText();
     } catch (err) {
         status.innerText = "Save failed. Check connection.";
     }
