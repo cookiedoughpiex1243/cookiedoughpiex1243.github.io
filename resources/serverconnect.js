@@ -51,7 +51,7 @@ window.addEventListener('DOMContentLoaded', () => {
     
     // Save on Enter key
     input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') saveToServer();
+        if (e.key === 'Enter' && !e.shiftKey) saveToServer();
     });
 
     // Save when clicking away
