@@ -13,7 +13,7 @@ async function loadText() {
         inputField.value = data.message || "";
 
         if(displayDiv) {
-            displayDiv.innerText = data.message || "No message saved yet.";
+            displayDiv.value = data.message || "No message saved yet.";
         }
 
         status.innerText = "Loaded from cloud.";
