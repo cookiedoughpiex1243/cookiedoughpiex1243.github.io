@@ -7,7 +7,7 @@ else {
                        
 function logoutbtn () {
   lobtn = `
-  <button class="back-button" id="logout" style="bottom:20px; left:20px; cursor: pointer;position:fixed;">Logout</button>
+  <button class="back-button" id="logout" style="bottom:20px; left:20px; cursor: pointer;position:fixed; background-color:black;color:green;">Logout</button>
   `
   document.body.insertAdjacentHTML('beforeend', lobtn);
 }
