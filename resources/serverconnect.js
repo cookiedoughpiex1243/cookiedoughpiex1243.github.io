@@ -1,13 +1,28 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
-async function getFromServer() {
-  try {
-    const response = await fetch(`${CLOUD_URL}/load`);
+
+async function loadText() {
+    const status = document.getElementById('status');
+    const inputField = document.getElementById('userMsg');
+    const displayDiv = document.getElementById('displayArea');
+
+    try {
+        const response = await fetch(`${CLOUD_URL}/load`);
         const data = await response.json();
-        document.getElementById('userMsg').value = data.message || "";
+
+        inputField.value = data.message || "";
+
+        if(displayDiv) {
+            displayDiv.innerText = data.message || "No message saved yet.";
+        }
+
+        status.innerText = "Loaded from cloud.";
     } catch (err) {
-        console.error("Server is still waking up...", err);
+        status.innerText = "Server is waking up... wait 50s.";
+        setTimeout(loadText, 5000);
     }
 }
+
+window.onload = loadText;
 
 async function saveToServer() {
     const text = document.getElementById('userMsg').value;
@@ -18,3 +33,13 @@ async function saveToServer() {
     });
     alert("Saved to server");
 }
+
+// 1. Save when the user clicks 'Enter' inside the input
+document.getElementById('userMsg').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        saveToServer();
+    }
+});
+
+// 2. OR Save when the user clicks away from the input (blur)
+document.getElementById('userMsg').addEventListener('blur', saveToServer);
