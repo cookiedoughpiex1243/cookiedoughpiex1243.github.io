@@ -17,5 +17,6 @@ const lob = document.getElementById("logout");
 document.addEventListener('click', function(e) {
   if (e.target == lob) {
     sessionStorage.removeItem('loggedIn');
+    sessionStorage.setItem('site', 'logout');
     window.location.replace("login");
   }});
