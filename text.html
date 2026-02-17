@@ -25,5 +25,10 @@
     <div class="backbuttonc">
       <a href="loggedin" class="back-button">Back</a>
     </div>
+    <script>
+      document.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('site', 'logout');
+      });
+    </script>
   </body>
 </html>
