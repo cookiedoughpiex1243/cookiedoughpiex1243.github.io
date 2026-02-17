@@ -1,4 +1,6 @@
-sessionStorage.setItem("site", "login");
+if (!sessionStorage.getItem("site")) {
+    sessionStorage.setItem("site", "login");
+};
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -37,9 +39,12 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color = "red";
     message.innerText = " Nope, wrong login :("
     pass.value = "";
-document.addEventListener('keypress', function (e) {
+}
+  });
+    document.addEventListener('keypress', function (e) {
   if (e.key == 'Enter') {
     document.getElementById('loginbtn').click();
-  }
-  });
-  }});
+    }
+    });
+
+    
