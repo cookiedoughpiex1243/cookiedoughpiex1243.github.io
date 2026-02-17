@@ -18,26 +18,25 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     sessionStorage.setItem('loggedIn', 'true');
     if (sessionStorage.getItem(site) === "mainlogin") {
     setTimeout (() => {
-      window.location.href = "loggedin"
+      window.location.href = "loggedin";
       message.innerText = ""}, 1000);
     }
     else if (sessionStorage.getItem(site) === "text") {
     setTimeout (() => {
-    window.location.href = "text"
+    window.location.href = "text";
     message.innerText = ""}, 1000);
     }
     else {
       setTimeout (() => {
-    window.location.href = "loggedin"
+    window.location.href = "loggedin";
     message.innerText = ""}, 1000);
   }
-  else {
+}
+});
+else {
     message.style.color = "red";
     message.innerText = " Nope, wrong login :("
     pass.value = "";
-  }
-});
-
 document.addEventListener('keypress', function (e) {
   if (e.key == 'Enter') {
     document.getElementById('loginbtn').click();
