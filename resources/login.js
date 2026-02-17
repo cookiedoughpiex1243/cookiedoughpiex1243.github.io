@@ -26,6 +26,10 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     window.location.href = "text"
     message.innerText = ""}, 1000);
     }
+    else {
+      setTimeout (() => {
+    window.location.href = "loggedin"
+    message.innerText = ""}, 1000);
   }
   else {
     message.style.color = "red";
