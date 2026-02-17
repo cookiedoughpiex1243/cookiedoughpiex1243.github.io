@@ -47,7 +47,7 @@
     }
     .download-btn {
       display: inline-block;
-      margin: 0px 0;
+      margin: 8px 0;
       padding: 10px 16px;
       background-color: #39FF14;
       color: #000;
@@ -73,7 +73,7 @@
       display: flex;
       flex-direction:column;
       text-align: center;
-      align-itmes: center;
+      align-items: center;
       color: #00ffff;
       margin-top: 20px;
       margin-bottom: 50px
