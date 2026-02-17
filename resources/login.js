@@ -32,8 +32,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.innerText = ""}, 1000);
   }
 }
-});
-else {
+  else {
     message.style.color = "red";
     message.innerText = " Nope, wrong login :("
     pass.value = "";
@@ -42,4 +41,4 @@ document.addEventListener('keypress', function (e) {
     document.getElementById('loginbtn').click();
   }
   });
-    
+});
