@@ -6,7 +6,7 @@ async function loadText() {
     const displayDiv = document.getElementById('displayArea');
 
     try {
-        const response = await fetch(`${CLOUD_URL}/loadsdata1`);
+        const response = await fetch(`${CLOUD_URL}/load`);
         const data = await response.json();
 
         // Use .message to match syour save function
@@ -32,7 +32,7 @@ async function saveToServer() {
     status.innerText = "Saving...";
     
     try {
-        await fetch(`${CLOUD_URL}/savesdata1`, {
+        await fetch(`${CLOUD_URL}/save`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text })
