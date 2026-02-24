@@ -9,7 +9,7 @@ async function loadText() {
         const response = await fetch(`${CLOUD_URL}/load`);
         const data = await response.json();
 
-        // Use .message to match your save function
+        // Use .message to match syour save function
         inputField.value = data.message || "";
 
         if(displayDiv) {
