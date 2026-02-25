@@ -1,6 +1,6 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 
-async function loadText() {
+async function loadsd1() {
         const status = document.getElementById('status');
         const userMsg = document.getElementById('userMsg');
         const displayArea = document.getElementById('displayArea');
@@ -25,11 +25,11 @@ async function loadText() {
     } catch (err) {
         console.error("Load error:", err);
         status.innerText = "Syncing...";
-        setTimeout(loadText, 5000);
+        setTimeout(loadsd1, 5000);
     }
 }
 
-async function saveToServer() {
+async function savesd1() {
 const status = document.getElementById('status');
 const text = document.getElementById('userMsg').value;
 
@@ -42,7 +42,7 @@ headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ message: text })
 });
 status.innerText = "Saved to server!";
-        loadText();
+        loadsd1();
 } catch (err) {
 status.innerText = "Save failed. Check connection.";
 }
@@ -50,15 +50,15 @@ status.innerText = "Save failed. Check connection.";
 
 // Ensure the page is fully loaded before attaching listeners
 window.addEventListener('DOMContentLoaded', () => {
-loadText();
+loadsd1();
 
 const input = document.getElementById('userMsg');
 
 // Save on Enter key
 input.addEventListener('keypress', (e) => {
-if (e.key === 'Enter' && !e.shiftKey) saveToServer();
+if (e.key === 'Enter' && !e.shiftKey) savesd1();
 });
 
 // Save when clicking away
-input.addEventListener('blur', saveToServer);
+input.addEventListener('blur', savesd1);
 });

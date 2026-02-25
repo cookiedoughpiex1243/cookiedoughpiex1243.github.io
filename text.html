@@ -12,15 +12,17 @@
       <link rel="icon" href="resources/Cookie pfp 2.png">
   </head>
   <body>
-    <div class="box" style="justify-content:center;">
-      <h2 class="glow-cyan">Notes</h2>
-      
-      <textarea class="login-input" id="userMsg" rows="4" placeholder="Type here..." style="resize: vertical;"></textarea>
-      <button class="login-button" onclick="saveToServer()" class="download-btn" style="margin: 10px 0;max-height:1000px;cursor: pointer;background-color:green; color:black;">SAVE TO CLOUD</button>
-<br>
-      <textarea class="login-input" id="displayArea" readonly style="border-style: dashed; opacity: 0.7; resize: none;" rows="4"></textarea>
+    <div class="boxarea">
+      <div class="box" style="justify-content: center; align-items: center;">
+        <h2 class="glow-cyan">Note 1</h2>
+        
+        <textarea class="login-input" id="userMsg" rows="4" placeholder="Type here..." style="resize: vertical;"></textarea>
+        <button class="login-button" onclick="savesd1()" class="download-btn" style="margin: 10px 0;max-height:1000px;cursor: pointer;background-color:green; color:black;">SAVE TO CLOUD</button>
+        <br>
+        <textarea class="login-input" id="displayArea" readonly style="border-style: dashed; opacity: 0.7; resize: none;" rows="4"></textarea>
 
-      <p id="status" style="color: #00ffff; font-size: 12px; margin-top: 15px;">Connecting...</p>
+        <p id="status" style="color: #00ffff; font-size: 12px; margin-top: 15px;">Connecting...</p>
+      </div>
     </div>
     <div class="backbuttonc">
       <a href="loggedin" class="back-button">Back</a>

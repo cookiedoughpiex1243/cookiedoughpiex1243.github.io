@@ -110,10 +110,11 @@
       transform:translate(-50%, -50%);
       padding:20px;
       text-align:center;
-      position:fixed;
+      position:absolute;
       border:2px solid #00ffff;
       border-radius:12px;
       animation: fadeInScale 0.3s ease-out forwards;
+      min-width: 0px;
     }
     .closebtn {
       color: #ff4444;
@@ -192,5 +193,15 @@
   color: #39FF14;
   font-family: monospace;
   border: 1px solid #39FF14;
+}
+
+.boxarea {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width:50%;
+  left:0px;
 }
 
