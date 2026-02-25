@@ -6,7 +6,7 @@ async function loadText() {
         const displayArea = document.getElementById('displayArea');
 
     try {
-        const response = await fetch(`${CLOUD_URL}/load`);
+        const response = await fetch(`${CLOUD_URL}/loadsdata1`);
         
         if (!response.ok) {
             throw new Error(`Server responded with ${response.status}`);
@@ -15,7 +15,7 @@ async function loadText() {
         const data = await response.json();
         // Your backend saves { message: text }, so we access data.message
         userMsg.value = data.message || "";
-        
+
         if (displayArea) {
                 displayArea.value = data.message || "No message saved yet";
         }        
@@ -36,7 +36,7 @@ const text = document.getElementById('userMsg').value;
 status.innerText = "Saving...";
 
 try {
-await fetch(`${CLOUD_URL}/save`, {
+await fetch(`${CLOUD_URL}/savesdata1`, {
 method: 'POST',
 headers: { 'Content-Type': 'application/json' },
 body: JSON.stringify({ message: text })
