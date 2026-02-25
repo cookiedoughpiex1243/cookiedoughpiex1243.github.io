@@ -1,6 +1,10 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 
 async function loadText() {
+        const status = document.getElementById('status');
+        const userMsg = document.getElementById('userMsg');
+        const displayArea = document.getElementById('displayArea');
+
     try {
         const response = await fetch(`${CLOUD_URL}/load`);
         
@@ -10,7 +14,11 @@ async function loadText() {
 
         const data = await response.json();
         // Your backend saves { message: text }, so we access data.message
-        inputField.value = data.message || "";
+        userMsg.value = data.message || "";
+        
+        if (displayArea) {
+                displayArea.value = data.message || "No message saved yet";
+        }        
         
         status.innerText = "Loaded from cloud.";
         status.style.color = "#39ff14";
