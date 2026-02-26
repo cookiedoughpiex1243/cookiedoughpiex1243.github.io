@@ -1,3 +1,19 @@
+  .menu {
+    justify-content: right;
+    align-items: center;
+    flex-direction: column;
+    display: flex;
+    position:absolute;
+    bottom: 0px;
+    right: 2px;
+    max-width: max-content;
+    height: max-content;
+  }
+  .menu a {
+    min-width: 10px;
+    width: auto;
+    margin: 10px;
+  }
   body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -159,6 +175,7 @@
     }
 
       .backbuttonc {
+    z-index: 1001;
   text-align: center;
   position: fixed;
   left: 50%;
