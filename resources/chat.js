@@ -15,8 +15,12 @@ async function loadChat() {
         
         // Anti-flicker: Only update if the content actually changed
         //if (displayArea && displayArea.value !== data.message) {
-           displayArea.value = data.message || displayArea.placeholder = "Connected, Type your message above...";
-           displayArea.style.placeholder = "Connected, Type your message above...";
+           displayArea.value = data.message || "Connected, waiting for messages...";
+           document.getElementById("status").innerText = document.getElementById("status").innerText === "Connecting..." ? "Connected!" :
+           document.getElementById("status").innerText;
+           setTimeout(() => {
+            document.getElementById("status").innerText = "";
+            }, 1000);
        // }
     } catch (err) {
         console.error("Load error:", err);
@@ -55,12 +59,7 @@ window.addEventListener('DOMContentLoaded', () => {
         loadRoute: '/loadcdata2'
     };
     
-    setTimeout(() => {
-        document.getElementById("status").innerText = "Connected!";
-    }, 750);
-    setTimeout(() => {
-        document.getElementById("status").innerText = "";
-    }, 2000);
+    
     loadChat();
     setInterval(loadChat, 750);
 
