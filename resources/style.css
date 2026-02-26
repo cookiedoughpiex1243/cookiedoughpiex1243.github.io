@@ -182,7 +182,7 @@
   transform: translateX(-50%);
   bottom: 20px;
   margin-top: 25px;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .back-button {
@@ -218,7 +218,7 @@
   border-radius: 8px;
   line-height: 1.8;                 
   text-align: center;
-  box-shadow : 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .glow-cyan {
