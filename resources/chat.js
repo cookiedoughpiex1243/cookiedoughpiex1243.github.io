@@ -15,7 +15,8 @@ async function loadChat() {
         
         // Anti-flicker: Only update if the content actually changed
         //if (displayArea && displayArea.value !== data.message) {
-           displayArea.value = data.message || "no data yet";
+           displayArea.value = data.message;
+           displayArea.style.placeholder = "Connected, Type your message here...";
        // }
     } catch (err) {
         console.error("Load error:", err);
