@@ -175,6 +175,7 @@
     }
 
       .backbuttonc {
+    z-index: 1001;
   text-align: center;
   position: fixed;
   left: 50%;
