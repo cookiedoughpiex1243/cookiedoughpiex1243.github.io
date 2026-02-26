@@ -107,16 +107,9 @@ status.innerText = "Save failed. Check connection.";
 }
 }
 
-function startAutoSync() {
-    setInterval(async () => {
-       await loadsd2();
-    }, 750);
-}
 
 window.addEventListener('DOMContentLoaded', () => {
 loadsd2();
-startAutoSync();
-
 const input = document.getElementById('userMsg2');
 
 // Save on Enter key
