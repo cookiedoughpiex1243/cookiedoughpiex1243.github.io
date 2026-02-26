@@ -113,9 +113,22 @@ status.innerText = "Save failed. Check connection.";
 }
 }
 
+function startAutoSync() {
+    setInterval(async () => {
+       //if (document.activeElement.id !== 'userMsg1') {
+       await loadsd2();
+      // }
+       //else {
+        //await savesd1();
+       // await loadsd1();
+      // }
+    }, 750);
+}
+
 // Ensure the page is fully loaded before attaching listeners
 window.addEventListener('DOMContentLoaded', () => {
 loadsd2();
+startAutoSync();
 
 const input = document.getElementById('userMsg2');
 
@@ -127,3 +140,7 @@ if (e.key === 'Enter' && !e.shiftKey) savesd2();
 // Save when clicking away
 input.addEventListener('blur', savesd2);
 });
+
+fetch(`${CLOUD_URL}/loadsdata1`);
+fetch(`${CLOUD_URL}/loadsdata2`);
+

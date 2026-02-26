@@ -34,8 +34,17 @@ async function pushUpdate() {
     }
 }
 
+function startAutoSync() {
+    setInterval(async () => { { 
+            await loadChat();
+        }
+    }, 750);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-    loadChat(); // Load the current cloud data when you open the admin page
+    loadChat();
+    startAutoSync();
+
 
     const input = document.getElementById('userMsg2');
 

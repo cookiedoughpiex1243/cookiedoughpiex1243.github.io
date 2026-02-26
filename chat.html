@@ -11,9 +11,9 @@
         <div class="boxoverlay" style="display: block;">
             <div class="box">
                 <h2 class="glow-cyan">Chat maybe?</h2>
-                <textarea name="userMsg2" id="userMsg2" rows="5"></textarea>
-                <button class="download-btn" onclick="loadChat()">Sync</button>
-                <textarea id="displayArea1" rows="5" readonly style="border-style: dashed; opacity: 0.7;"></textarea>
+                <textarea class="login-input" id="userMsg2" rows="5"></textarea>
+                <button class="download-btn" onclick="loadChat(), pushUpdate()">Sync</button>
+                <textarea id="displayArea1" class="login-input" rows="5" readonly style="border-style: dashed; opacity: 0.7;"></textarea>
             </div>
         </div>
     </body>
