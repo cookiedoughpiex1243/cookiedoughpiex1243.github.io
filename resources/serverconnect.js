@@ -13,7 +13,6 @@ async function loadsd1() {
         }
 
         const data = await response.json();
-        // Your backend saves { message: text }, so we access data.message
         userMsg1.value = data.message || "";
 
         if (displayArea1) {
@@ -48,18 +47,15 @@ status1.innerText = "Save failed. Check connection.";
 }
 }
 
-// Ensure the page is fully loaded before attaching listeners
 window.addEventListener('DOMContentLoaded', () => {
 loadsd1();
 
 const input = document.getElementById('userMsg1');
 
-// Save on Enter key
 input.addEventListener('keypress', (e) => {
 if (e.key === 'Enter' && !e.shiftKey) savesd1();
 });
 
-// Save when clicking away
 input.addEventListener('blur', savesd1);
 });
 
@@ -78,9 +74,7 @@ async function loadsd2() {
         }
 
         const data = await response.json();
-        // Your backend saves { message: text }, so we access data.message
         userMsg2.value = data.message || "";
-
         if (displayArea) {
                 displayArea.value = data.message || "No message saved yet";
         }        
@@ -115,17 +109,10 @@ status.innerText = "Save failed. Check connection.";
 
 function startAutoSync() {
     setInterval(async () => {
-       //if (document.activeElement.id !== 'userMsg1') {
        await loadsd2();
-      // }
-       //else {
-        //await savesd1();
-       // await loadsd1();
-      // }
     }, 750);
 }
 
-// Ensure the page is fully loaded before attaching listeners
 window.addEventListener('DOMContentLoaded', () => {
 loadsd2();
 startAutoSync();

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="resources/style.css">
+        <script src="resources/chat.js"></script>
+        <script src="resources/loggedin.js" defer></script>
+        <script>
+            sessionStorage.setItem("site", "schat");
+        </script>
+        <title>User chat | Josh's site</title>
+    </head>
+    <body>
+        <div class="boxoverlay" style="display: block;">
+            <div class="box">
+                <h2 class="glow-cyan">Chat maybe?</h2>
+                <textarea class="login-input" id="userMsg1" rows="5"></textarea>
+                <button class="download-btn" onclick="loadChat(), pushUpdate()">Sync</button>
+                <textarea id="displayArea2" class="login-input" rows="5" readonly style="border-style: dashed; opacity: 0.7;"></textarea>
+            </div>
+        </div>
+    </body>
+</html>
