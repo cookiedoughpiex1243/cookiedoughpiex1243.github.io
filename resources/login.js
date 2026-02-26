@@ -19,21 +19,17 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('loggedIn', 'true');
-    if (sessionStorage.getItem("site") === "mainlogin") {
+    if (sessionStorage.getItem("site") === "login") {
     setTimeout (() => {
       window.location.href = "loggedin";
       message.innerText = ""}, 1000);
     }
-    else if (sessionStorage.getItem("site") === "text") {
+    
+    else {
     setTimeout (() => {
-    window.location.href = "text";
+    window.location.href = sessionStorage.getItem("site");
     message.innerText = ""}, 1000);
     }
-    else {
-      setTimeout (() => {
-    window.location.href = "loggedin";
-    message.innerText = ""}, 1000);
-  }
 }
   else {
     message.style.color = "red";
