@@ -39,11 +39,9 @@ async function pushUpdate() {
     }
 }
 
-// 2. This is where we link the code to your specific HTML page
 window.addEventListener('DOMContentLoaded', () => {
     const isPChat = sessionStorage.getItem("site") === "pchat";
 
-    // Map the routes and IDs based on the page
     chatConfig = isPChat ? {
         inputId: 'userMsg2',
         displayId: 'displayArea1',
@@ -56,17 +54,18 @@ window.addEventListener('DOMContentLoaded', () => {
         loadRoute: '/loadcdata2'
     };
 
-    // Initial load and sync start
     loadChat();
     setInterval(loadChat, 750);
 
-    // Event listeners for the Enter key and Blur
     const input = document.getElementById(chatConfig.inputId);
     if (input) {
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault(); // Stop extra newline
                 pushUpdate();
+                document.getElementById("status").innerText = "Sent!";
+                setTimeout(() => {
+                    document.getElementById("status").innerText = "";
+                }, 2000);
             }
         });
         input.addEventListener('blur', pushUpdate);
