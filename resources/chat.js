@@ -1,4 +1,10 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+    const userMsg1 = document.getElementById('userMsg1');
+    const displayArea2 = document.getElementById('displayArea2');
+    const userMsg2 = document.getElementById('userMsg2');
+    const displayArea1 = document.getElementById('displayArea1');
+
+
 if (sessionStorage.getItem("site") == "pchat") {
 async function loadChat() {
     const userMsg2 = document.getElementById('userMsg2');
@@ -33,10 +39,9 @@ async function pushUpdate() {
 }
 
 function startAutoSync() {
-    setInterval(async () => { { 
+    setInterval(async () =>  { 
             await loadChat();
-        }
-    }, 750);
+        }, 750);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -56,9 +61,7 @@ window.addEventListener('DOMContentLoaded', () => {
 }
 else {
     async function loadChat() {
-    const userMsg1 = document.getElementById('userMsg1');
-    const displayArea2 = document.getElementById('displayArea2');
-
+    
     try {
         const response = await fetch(`${CLOUD_URL}/loadcdata2`);
         const data = await response.json();
@@ -88,10 +91,10 @@ async function pushUpdate() {
 }
 
 function startAutoSync() {
-    setInterval(async () => { { 
+    setInterval(async () =>  { 
             await loadChat();
         }
-    }, 750);
+    , 750);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
