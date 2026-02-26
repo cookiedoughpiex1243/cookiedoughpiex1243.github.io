@@ -14,9 +14,9 @@ async function loadChat() {
         const data = await response.json();
         
         // Anti-flicker: Only update if the content actually changed
-        if (displayArea && displayArea.value !== data.message) {
-            displayArea.value = data.message || "no data yet";
-        }
+        //if (displayArea && displayArea.value !== data.message) {
+        //    displayArea.value = data.message || "no data yet";
+       // }
     } catch (err) {
         console.error("Load error:", err);
     }
@@ -53,7 +53,13 @@ window.addEventListener('DOMContentLoaded', () => {
         saveRoute: '/savecdata1',
         loadRoute: '/loadcdata2'
     };
-
+    
+    setTimeout(() => {
+        document.getElementById("status").innerText = "Connected!";
+    }, 750);
+    setTimeout(() => {
+        document.getElementById("status").innerText = "";
+    }, 2000);
     loadChat();
     setInterval(loadChat, 750);
 
@@ -62,6 +68,7 @@ window.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 pushUpdate();
+                document.getElementById("status").style.color = "#39ff14";
                 document.getElementById("status").innerText = "Sent!";
                 setTimeout(() => {
                     document.getElementById("status").innerText = "";
