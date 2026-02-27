@@ -14,11 +14,11 @@
     </head>
     <body>
         <div class="boxoverlay" style="display: block;">
-            <div class="box">
+            <div class="box" style="height: auto;">
                 <h2 class="glow-cyan">Chat </h2>
-                <textarea class="login-input" id="userMsg2" rows="5" placeholder="Type here and press Enter, the 'Sync' Button or tap anywhere else to send."></textarea>
-                <button class="download-btn" onclick="pushUpdate()">Sync</button>
                 <textarea id="displayArea1" class="login-input" rows="5" readonly style="border-style: dashed; opacity: 0.7;" placeholder="Connecting..."></textarea>
+                <button class="download-btn" onclick="pushUpdate()" style="padding: 2px 2px; margin: 0px;">Send</button>
+                <textarea class="login-input" id="userMsg2" rows="5" placeholder="Type here and press Enter, the 'Send' Button or tap anywhere else to send."></textarea>
                 <p id="status" style="color: #00ffff; font-size: 12px; margin-top: 15px;">Connecting...</p>
 
             </div>
