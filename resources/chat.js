@@ -15,7 +15,7 @@ async function loadChat() {
         
         // Anti-flicker: Only update if the content actually changed
         //if (displayArea && displayArea.value !== data.message) {
-           displayArea.value = data.message || "Connected, waiting for messages...";
+           displayArea.value = data.message || "Connected, waiting for messages...\nType in the box below to send.";
            if (document.getElementById("status").innerText === "Connecting...") {
            document.getElementById("status").innerText = document.getElementById("status").innerText === "Connecting..." ? "Connected!" :
            document.getElementById("status").innerText;
