@@ -10,7 +10,6 @@ async function loadChat() {
     const displayArea = document.getElementById(chatConfig.displayId);
     if (!displayArea)
         return;
-    console.warn("waiting for display area...");
 
     try {
         const response = await fetch(`${CLOUD_URL}${chatConfig.loadRoute}`);
