@@ -5,23 +5,25 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 let chatConfig = {};
 
 async function loadChat() {
-    // If the config hasn't been set yet, don't run
-    if (!chatConfig.displayId) return;
+    if (!chatConfig || !chatConfig.displayId) return;
 
     const displayArea = document.getElementById(chatConfig.displayId);
+    if (!displayArea)
+        return;
+
     try {
         const response = await fetch(`${CLOUD_URL}${chatConfig.loadRoute}`);
         const data = await response.json();
         
         // Anti-flicker: Only update if the content actually changed
         //if (displayArea && displayArea.value !== data.message) {
-           displayArea.value = data.message || "Connected, waiting for messages...";
+           displayArea.value = data.message || "Connected, waiting for messages...\nType in the box below to send.";
            if (document.getElementById("status").innerText === "Connecting...") {
            document.getElementById("status").innerText = document.getElementById("status").innerText === "Connecting..." ? "Connected!" :
            document.getElementById("status").innerText;
            setTimeout(() => {
             document.getElementById("status").innerText = "";
-            }, 1000);
+            }, 750);
         }
        // }
     } catch (err) {

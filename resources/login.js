@@ -19,7 +19,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('loggedIn', 'true');
-    if (sessionStorage.getItem("site") === "login") {
+    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("site") === "pchat") {
     setTimeout (() => {
       window.location.href = "loggedin";
       message.innerText = ""}, 1000);
