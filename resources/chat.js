@@ -5,10 +5,13 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 let chatConfig = {};
 
 async function loadChat() {
-    // If the config hasn't been set yet, don't run
-    if (!chatConfig.displayId) return;
+    if (!chatConfig || !chatConfig.displayId) return;
 
     const displayArea = document.getElementById(chatConfig.displayId);
+    if (!displayArea)
+        return;
+    console.warn("waiting for display area...");
+
     try {
         const response = await fetch(`${CLOUD_URL}${chatConfig.loadRoute}`);
         const data = await response.json();
