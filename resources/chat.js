@@ -24,7 +24,7 @@ async function loadChat() {
            document.getElementById("status").innerText;
            setTimeout(() => {
             document.getElementById("status").innerText = "";
-            }, 1000);
+            }, 750);
         }
        // }
     } catch (err) {
