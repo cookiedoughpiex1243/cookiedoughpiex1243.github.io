@@ -3,6 +3,7 @@ const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
 const user = sessionStorage.getItem("user") || "anonymous"
+const site = sessionStorage.getItem("site") || "unknown"
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -47,7 +48,7 @@ async function loadMessages() {
                 messageElement.classList.add('messageBox');
                 const user = msg.sender === sessionStorage.getItem("user");
                 messageElement.innerHTML = `
-                    <h4>${user ? user : msg.sender}</h4>
+                    <h4>${user === "emma" && site === "echat"  ? "Echat." : "jchat"}</h4>
                     <p class="messageText"></p>
                     <h6 class="timestamp">${msg.timestamp}</h6>
                 `;
