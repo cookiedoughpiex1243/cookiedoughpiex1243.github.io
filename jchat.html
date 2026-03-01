@@ -1,13 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>WIP Site 1</title>
+        <title>WIP Site 2</title>
+        <script src="resources/echat.js" defer></script>
+        <script>
+            sessionStorage.setItem("user", "josh")
+        </script>
         <link rel="stylesheet" href="resources/style.css">
-        <link rel="icon" href="resources/Cookie pfp 2.png">
+        <link rel="icon" type="image/x-icon" href="https://i.pinimg.com/564x/92/76/af/9276af3230fe7ae13c4d9398dd8d8381.jpg" style="border-radius: 6px;">
     </head>
-    <body>
-        <div class="messageBox">        
-            Wait for English Literature holidays.
+    <body class="chatsite">
+        <div class="cwrapper">
+             <div class="messageBox">
+                <h4>Josh</h4>
+                Wait for English Literature holidays.
+                <h6>Sent at 12:00 PM</h6>
+            </div>
+            <div class="messageBox">
+                <h4>Josh</h4>
+                Wait for English Literature exam.
+                <h6>Sent at 12:00 PM</h6>
+            </div>
+        </div>  
+        <div class="inputbox"><input id="userMsg2" class="login-input" type="text" placeholder="Type a message...">
+            <button class="download-btn" id="sendbtn">Send</button>
         </div>
+            
     </body>
 </html>

@@ -2,6 +2,7 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
+const user = sessionStorage.getItem("user") || "anonymous"
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -44,9 +45,9 @@ async function loadMessages() {
                 const msg = messages[i];
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('messageBox');
-                const isMe = msg.sender === sessionStorage.getItem("user");
+                const user = msg.sender === sessionStorage.getItem("user");
                 messageElement.innerHTML = `
-                    <h4>${isMe === "emma" ? "You" : "Stranger"}</h4>
+                    <h4>${user ? user : msg.sender}</h4>
                     <p class="messageText"></p>
                     <h6 class="timestamp">${msg.timestamp}</h6>
                 `;
