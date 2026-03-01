@@ -21,7 +21,7 @@ async function sendMessage() {
             body: JSON.stringify({
                 text: message,
                 timestamp: time,
-                sender: sessionStorage.getItem("chatId") || "anon"
+                sender: sessionStorage.getItem("user") || "anon"
             })
         });
         messageInput.value = '';
