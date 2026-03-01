@@ -1,3 +1,20 @@
+ .inputbox {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    box-sizing: border-box;
+    bottom: 0em;
+    position: fixed;
+    margin-top: 1em;
+    margin-bottom: 0px;
+ }
+
+ .chatsite .download-btn {
+  padding: 0.25em;
+ }
+ 
  .cwrapper {
     align-items: flex-start;
     display: flex;
@@ -5,8 +22,15 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    margin-bottom: 50px;
+    margin-bottom: 4em;
  }
+
+ .chatsite .login-input  {
+width: 100%;
+box-sizing: border-box;
+margin-bottom: 0px;
+ }
+
 .messageBox h4 {
     margin: 0;
     padding: 0;
@@ -64,6 +88,7 @@
     }
 
     body.chatsite {
+      overflow: hidden;
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #0b0c10;
@@ -74,7 +99,7 @@
       flex: 1;
       flex-direction: column;
       width: 100%;
-      min-height: 100vh;
+      height: 100vh;
     }
     
     .wrapper {
