@@ -9,16 +9,19 @@ messageInput.addEventListener('keypress', function(event) {
 
 function sendMessage() {
     const message = messageInput.value;
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     if (message === '') return;
-    const messageElement = `
-    <div class="messageBox">
-                <h4>Josh</h4>
-                ${message}
-                <h6>Sent at ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</h6>
-            </div>
-    `
-    wrapper.insertAdjacentHTML('beforeend', messageElement);
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('messageBox');
+    messageElement.innerHTML = `
+        <h4>You</h4>
+        <p class="messageText"></p>
+        <h6 class="timestamp">${time}</h6>
+    `;
+    messageElement.querySelector('.messageText').textContent = message;
+    wrapper.appendChild(messageElement);
     messageInput.value = '';
+    wrapper.scrollTop = wrapper.scrollHeight;
 }
 
 sendbtn.addEventListener('click', sendMessage);

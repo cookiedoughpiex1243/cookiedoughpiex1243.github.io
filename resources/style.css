@@ -18,12 +18,27 @@
  .cwrapper {
     align-items: flex-start;
     display: flex;
-    justify-content: flex-end;
+    flex: 1;
     flex-direction: column;
+    justify-content: flex-start;
     width: 100%;
     height: 100%;
     margin-bottom: 4em;
+    overflow-y: auto;
+    box-sizing: border-box;
  }
+ .cwrapper::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .cwrapper::-webkit-scrollbar-track {
+    background: #0b0c10;
+  }
+  
+  .cwrapper::-webkit-scrollbar-thumb {
+    background-color: #00ffff;
+    border-radius: 4px;
+  }
 
  .chatsite .login-input  {
 width: 100%;
