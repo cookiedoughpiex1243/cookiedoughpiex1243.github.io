@@ -46,13 +46,22 @@ async function loadMessages() {
                 const msg = messages[i];
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('messageBox');
-                const user = msg.sender === sessionStorage.getItem("user");
+                const user = msg.sender === "josh" ? "Josh" : "Emma" ;
+                /*if (messageElement.querySelector("h4") === "Josh" && site === "jchat") {
+                    messageElement.style.right = "0px";
+                    messageElement.style.position = "fixed";
+                }
+                else if (messageElement.querySelector("h4") === "Emma" && site === "echat") {
+                    messageElement.style.right = "0px";
+                    messageElement.style.position = "fixed";
+                }
+                else {}*/
                 messageElement.innerHTML = `
-                    <h4>${user === "emma" && site === "echat"  ? "Echat." : "jchat"}</h4>
+                    <h4 style=${msg.sender === "emma" ? "color:pink" : "color: #00ffff"}></h4>
                     <p class="messageText"></p>
                     <h6 class="timestamp">${msg.timestamp}</h6>
                 `;
-                messageElement.querySelector("h4").innerText = msg.sender;
+                messageElement.querySelector("h4").innerText = user;
                 messageElement.querySelector('.messageText').textContent = msg.text;
                 wrapper.appendChild(messageElement);
             }
