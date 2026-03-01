@@ -52,6 +52,7 @@ async function loadMessages() {
                     <p class="messageText"></p>
                     <h6 class="timestamp">${msg.timestamp}</h6>
                 `;
+                messageElement.querySelector("h4").innerText = msg.sender;
                 messageElement.querySelector('.messageText').textContent = msg.text;
                 wrapper.appendChild(messageElement);
             }
