@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <script>
+    sessionStorage.setItem("locked", "false");
     if (sessionStorage.getItem('loggedIn') == "true") {
     window.location.replace("loggedin")
     }

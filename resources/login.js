@@ -19,16 +19,16 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('loggedIn', 'true');
-    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("site") === "pchat") {
+    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
     setTimeout (() => {
       window.location.href = "loggedin";
-      message.innerText = ""}, 1000);
+      message.innerText = ""}, 750);
     }
     
     else {
     setTimeout (() => {
     window.location.href = sessionStorage.getItem("site");
-    message.innerText = ""}, 1000);
+    message.innerText = ""}, 750);
     }
 }
   else {
