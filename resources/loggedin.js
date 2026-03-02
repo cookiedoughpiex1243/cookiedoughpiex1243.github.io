@@ -1,4 +1,7 @@
-if (sessionStorage.getItem('loggedIn') === 'true') {
+sessionStorage.removeItem("locked");
+sessionStorage.setItem("locked", "true");
+
+if (sessionStorage.getItem('loggedIn') === 'true' || localStorage.getItem('loggedIn') === 'true') {
   document.body.style.display = "block";
 }
 else {
@@ -16,8 +19,10 @@ sessionStorage.getItem("site") !== "jchat" && sessionStorage.getItem("site") !==
 const lob = document.getElementById("logout");
 document.addEventListener('click', function(e) {
   if (e.target == lob) {
+    localStorage.removeItem('loggedIn');
     sessionStorage.removeItem('loggedIn');
     sessionStorage.setItem('site', 'logout');
     window.location.replace("login");
   }});
-sessionStorage.setItem("locked", "true");
+
+

@@ -4,6 +4,9 @@ const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
 const user = sessionStorage.getItem("user") || "anonymous"
 let site = sessionStorage.getItem("site") || "unknown";
+sessionStorage.removeItem("locked");
+sessionStorage.setItem("locked", "true");
+
 
 function boxDelay () {
     setTimeout(() => {
@@ -27,6 +30,7 @@ async function sendMessage() {
     const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     if (message === '') return;
     if (message === "/logout") {
+        localStorage.removeItem('loggedIn');
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'logout');
         window.location.replace("login");

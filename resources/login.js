@@ -10,6 +10,7 @@ async function hashPassword(password) {
 }
 
 document.getElementById('loginbtn').addEventListener('click', async function () {
+  const remember = document.getElementById('rememberMe');
   const user = document.getElementById('username');
   const pass = document.getElementById('password');
   const message = document.getElementById('message');
@@ -18,7 +19,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   if (user.value.toLowerCase() === "josh" && inputHash === correctHash) {
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
-    sessionStorage.setItem('loggedIn', 'true');
+    remember.checked ? localStorage.setItem('loggedIn', 'true'):sessionStorage.setItem('loggedIn', 'true');
     sessionStorage.setItem('user', 'josh');
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") !== "true") {
     setTimeout (() => {
