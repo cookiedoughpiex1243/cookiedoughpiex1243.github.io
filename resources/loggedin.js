@@ -6,13 +6,13 @@ else {
 }
                        
 function logoutbtn () {
-  lobtn = `
+  const lobtn = `
   <button class="back-button" id="logout" style="bottom:20px; left:20px; cursor: pointer;position:fixed; background-color:black; color:orangered;">Logout</button>
   `
   document.body.insertAdjacentHTML('beforeend', lobtn);
 }
-
-logoutbtn();
+sessionStorage.setItem("locked", "true");
+sessionStorage.getItem("site") !== "jchat" && sessionStorage.getItem("site") !== "echat" ? logoutbtn() : null;
 const lob = document.getElementById("logout");
 document.addEventListener('click', function(e) {
   if (e.target == lob) {
