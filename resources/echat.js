@@ -19,6 +19,12 @@ async function sendMessage() {
     const message = messageInput.value;
     const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     if (message === '') return;
+    if (message === "/logout") {
+        sessionStorage.removeItem('loggedIn');
+        sessionStorage.setItem('site', 'logout');
+        window.location.replace("login");
+ } 
+    
 
     try {
         await fetch(`${CLOUD_URL}/saveechat`, {
@@ -36,6 +42,7 @@ async function sendMessage() {
         console.error("Error sending message:", err);
     }
 }
+
 
 sendbtn.addEventListener('click', sendMessage);
 
