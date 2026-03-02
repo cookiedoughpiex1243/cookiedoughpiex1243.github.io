@@ -1,7 +1,7 @@
 sessionStorage.removeItem("locked");
 sessionStorage.setItem("locked", "true");
 
-if (sessionStorage.getItem('loggedIn') === 'true' || localStorage.getItem('loggedIn') === 'true') {
+if (sessionStorage.getItem('loggedIn') === 'josh' || localStorage.getItem('loggedIn') === 'josh') {
   document.body.style.display = "block";
 }
 else {

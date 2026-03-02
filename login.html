@@ -4,7 +4,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
     !sessionStorage.getItem("locked") ? sessionStorage.setItem("locked", "false") : null;
-    if (sessionStorage.getItem('loggedIn') == "true" || localStorage.getItem("loggedIn") == "true") {
+    if (sessionStorage.getItem('loggedIn') !== "false" || localStorage.getItem("loggedIn") !== "false") {
     window.location.replace("loggedin")
     }
     else {}
