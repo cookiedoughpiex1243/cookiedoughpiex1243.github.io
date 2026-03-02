@@ -64,7 +64,7 @@ async function loadMessages() {
                     messageElement.style.marginLeft = "auto";
                 }
                 
-                const user = sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
+                const user = senderLower === "josh" ? "Josh" : "Echat";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
                 messageElement.innerHTML = `
                     <h4 style="${senderLower === "emma" ? "color: #ea00ff" : "color: #00ffff"}">${user}</h4>
                     <p class="messageText"></p>

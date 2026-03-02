@@ -349,14 +349,78 @@ margin-bottom: 0px;
 
 @media screen and (max-width: 768px) {
    
+ .inputbox {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    height: 3em;
+    box-sizing: border-box;
+    bottom: 0em;
+    position: fixed;
+    margin-top: 1em;
+    margin-bottom: 0px;
+ }
+
+ .chatsite .download-btn {
+  align-self: center;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  height: 3em;
+  box-sizing: border-box;
+ }
+ 
+ .cwrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    margin-bottom: 4em;
+    overflow-y: auto;
+    box-sizing: border-box;
+ }
+ .cwrapper::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .cwrapper::-webkit-scrollbar-track {
+    background: #0b0c10;
+  }
+  
+  .cwrapper::-webkit-scrollbar-thumb {
+    background-color: #00ffff;
+    border-radius: 4px;
+  }
+
+ .chatsite .login-input  {
+width: 100%;
+box-sizing: border-box;
+margin-bottom: 0px;
+border-right: none;
+ }
+
+.messageBox h4 {
+    margin: 0;
+    padding: 0;
+    color: #00ffff; 
+}
+.messageBox p, h6 {
+    margin: 1px;
+    padding: 0;
+      color: #f5f5f5; 
+    }
  .messageBox {
+  margin-top: 1em;
+    width: fit-content;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: left;
+    justify-content: left;
     border:2px solid #00ffff;
     border-radius: 6px;
-    padding: 1em;
+    padding: 0.75em;
  }
  
  .menu {
@@ -375,6 +439,13 @@ margin-bottom: 0px;
     width: auto;
     margin: 10px;
   }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+  }
   body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -385,6 +456,21 @@ margin-bottom: 0px;
       justify-content: center;
       min-height: 100vh;
     }
+
+    body.chatsite {
+      overflow: hidden;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b0c10;
+      color: #f5f5f5;
+      display: flex;
+      justify-content: flex-end;
+      flex: 1;
+      flex-direction: column;
+      width: 100%;
+      height: 100vh;
+    }
+    
     .wrapper {
       text-align: center;
     }
@@ -414,6 +500,11 @@ margin-bottom: 0px;
     .login-input:focus {
       border-color: #00ffff;
       box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .login-input::placeholder {
+      color: #00ffff;
+      opacity: 0.7;
     }
 
     
@@ -485,8 +576,7 @@ margin-bottom: 0px;
     }
     .box {
       background: #0b0c10;
-      width:90vw;
-      height: 90vh;
+      width:300px;
       padding:20px;
       text-align:center;
       border:2px solid #00ffff;
