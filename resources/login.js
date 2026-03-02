@@ -19,6 +19,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('loggedIn', 'true');
+    sessionStorage.setItem('user', 'josh');
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
     setTimeout (() => {
       window.location.href = "loggedin";
