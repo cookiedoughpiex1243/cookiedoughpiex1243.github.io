@@ -20,7 +20,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('loggedIn', 'true');
     sessionStorage.setItem('user', 'josh');
-    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
+    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") !== "true") {
     setTimeout (() => {
       window.location.href = "loggedin";
       message.innerText = ""}, 750);

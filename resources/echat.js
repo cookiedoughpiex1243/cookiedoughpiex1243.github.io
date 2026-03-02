@@ -5,6 +5,13 @@ const sendbtn = document.getElementById('sendbtn');
 const user = sessionStorage.getItem("user") || "anonymous"
 let site = sessionStorage.getItem("site") || "unknown";
 
+function boxDelay () {
+    setTimeout(() => {
+    document.body.style.display = "flex";
+    }, 500);
+}
+boxDelay();
+
 // Force site update based on URL to prevent stale session data
 if (window.location.href.includes("jchat")) site = "jchat";
 else if (window.location.href.includes("echat")) site = "echat";

@@ -11,7 +11,7 @@ function logoutbtn () {
   `
   document.body.insertAdjacentHTML('beforeend', lobtn);
 }
-sessionStorage.setItem("locked", "true");
+
 sessionStorage.getItem("site") !== "jchat" && sessionStorage.getItem("site") !== "echat" ? logoutbtn() : null;
 const lob = document.getElementById("logout");
 document.addEventListener('click', function(e) {
@@ -20,3 +20,4 @@ document.addEventListener('click', function(e) {
     sessionStorage.setItem('site', 'logout');
     window.location.replace("login");
   }});
+sessionStorage.setItem("locked", "true");
