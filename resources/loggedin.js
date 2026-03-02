@@ -21,7 +21,7 @@ document.addEventListener('click', function(e) {
   if (e.target == lob) {
     localStorage.removeItem('loggedIn');
     sessionStorage.removeItem('loggedIn');
-    sessionStorage.setItem('site', 'logout');
+    sessionStorage.setItem('site', 'login');
     window.location.replace("login");
   }});
 
