@@ -32,7 +32,7 @@ async function sendMessage() {
     if (message === "/logout") {
         localStorage.removeItem('loggedIn');
         sessionStorage.removeItem('loggedIn');
-        sessionStorage.setItem('site', 'logout');
+        sessionStorage.setItem('site', 'login');
         window.location.replace("login");
  } 
     
