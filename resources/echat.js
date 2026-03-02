@@ -46,16 +46,22 @@ async function loadMessages() {
                 const msg = messages[i];
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('messageBox');
-                const user = msg.sender === "josh" ? "Josh" : "Emma" ;
-                /*if (messageElement.querySelector("h4") === "Josh" && site === "jchat") {
+                const user = msg.sender === "josh" ? "Josh" : "Echat" ;
+                /*if (sessionStorage.getItem("site") === "jchat") {
+                    if (messageElement.querySelector("h4") === "Josh") {
+                    messageElement.style.right = "0px";  }
+                    }
+                    else if (user === "Echat"){
+                        messageElement.style.left = "0px";
+                    }
+                 else if (site === "echat") {
+                    if (user === "Echat")
                     messageElement.style.right = "0px";
-                    messageElement.style.position = "fixed";
-                }
-                else if (messageElement.querySelector("h4") === "Emma" && site === "echat") {
-                    messageElement.style.right = "0px";
-                    messageElement.style.position = "fixed";
+                    else if (user === "Josh")
+                    messageElement.style.left = "0px"
                 }
                 else {}*/
+                
                 messageElement.innerHTML = `
                     <h4 style=${msg.sender === "emma" ? "color:pink" : "color: #00ffff"}></h4>
                     <p class="messageText"></p>
