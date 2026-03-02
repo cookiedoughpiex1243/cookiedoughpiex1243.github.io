@@ -2,9 +2,10 @@
 <html lang="en">
 <head> 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="resources/login.js" defer></script>
   <script>
     !sessionStorage.getItem("locked") ? sessionStorage.setItem("locked", "false") : null;
-    if (sessionStorage.getItem('loggedIn') !== "false" || localStorage.getItem("loggedIn") !== "false") {
+    if (sessionStorage.getItem('loggedIn') === "josh" || localStorage.getItem("loggedIn") === "josh") {
     window.location.replace("loggedin")
     }
     else {}
@@ -42,6 +43,5 @@
 <div class="backbuttonc" style="z-index: 1001;">
   <a href="index" class="back-button">Back</a>
 </div>
-  <script src="resources/login.js"></script>
 </body>
 </html>

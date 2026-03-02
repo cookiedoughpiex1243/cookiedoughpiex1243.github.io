@@ -5,6 +5,7 @@
   <script>
     sessionStorage.setItem("site", "loggedin");
     sessionStorage.setItem("locked", "true");
+    
   </script>
   <script src="resources/loggedin.js" defer></script>
   <title>Dashboard | Josh's site</title>
@@ -19,6 +20,7 @@
     <a href="schat" class="back-button" style="background:black; color:#00ffff; border:2px solid #00ffff;">Chat</a>
     <a href="text" class="back-button" style="background:black; color:#00ffff; border:2px solid #00ffff;">Notes</a>
    </div>
+   <button class="back-button" style="background:black; color:#00ffff; border:2px solid #00ffff; position: absolute; right: 3em; bottom: 20px;" onclick="document.querySelector('.menu').style.display = document.querySelector('.menu').style.display === 'none' ? 'flex' : 'none';">Menu</button>
     <div class="box" style="transform: translateX(-50%, -50%); top:50%; left:50%;position: absolute;">
       <h2 class="glow-cyan">Only for cool guys (Josh)</h2>
       <p>cool text for josh.<br>
