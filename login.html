@@ -4,11 +4,12 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="resources/login.js" defer></script>
   <script>
-    !sessionStorage.getItem("locked") ? sessionStorage.setItem("locked", "false") : null;
-    if (sessionStorage.getItem('loggedIn') === "josh" || localStorage.getItem("loggedIn") === "josh") {
-    window.location.replace("loggedin")
-    }
-    else {}
+    const user = sessionStorage.getItem('loggedIn') || localStorage.getItem('loggedIn');
+
+if (user === "josh" || user === "emma") {
+    const target = (user === "josh") ? "loggedin" : "echat";
+    window.location.replace(target);
+}
   </script>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" 
