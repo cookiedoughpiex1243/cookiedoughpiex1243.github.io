@@ -21,7 +21,11 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('user', uservalue);
-    remember.checked ? localStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma"):sessionStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
+    if (remember.checked) {
+       localStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
+    } else {
+       sessionStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
+    }
     if (uservalue === "josh") {
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") !== "true") {
     setTimeout (() => {
@@ -47,6 +51,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     pass.value = "";
 }
   });
+
     document.addEventListener('keypress', function (e) {
   if (e.key == 'Enter') {
     const pass = document.getElementById('password');

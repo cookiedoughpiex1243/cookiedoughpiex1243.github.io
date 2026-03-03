@@ -4,8 +4,7 @@ const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
 const user = sessionStorage.getItem("user") || "anonymous"
 let site = sessionStorage.getItem("site") || "unknown";
-sessionStorage.removeItem("locked");
-sessionStorage.setItem("locked", "true");
+
 
 
 function boxDelay () {

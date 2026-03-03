@@ -1,8 +1,8 @@
-sessionStorage.removeItem("locked");
-sessionStorage.setItem("locked", "true");
+const lock = sessionStorage.getItem("locked");
+const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("loggedIn");
 
-if (sessionStorage.getItem('loggedIn') === 'josh' || localStorage.getItem('loggedIn') === 'josh') {
-  document.body.style.display = "block";
+if (loggedIn === lock ) {
+  document.body.style.display = "flex";
 }
 else {
   window.location.replace("login");
