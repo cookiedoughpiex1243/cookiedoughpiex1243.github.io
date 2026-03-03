@@ -104,7 +104,7 @@ async function clearChat() {
     if (!confirm("Delete all messages for everyone?")) return;
 
     try {
-        await fetch(`${CLOUD_URL}/deleteechat`, { method: 'DELETE' });
+        await fetch(`${CLOUD_URL}/deletecdata1`, { method: 'DELETE' });
         wrapper.innerHTML = ''; // Clear the screen immediately
     } catch (err) {
         console.error("Failed to clear chat:", err);
