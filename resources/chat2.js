@@ -2,7 +2,7 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
-const user = sessionStorage.getItem("user") || "anonymous"
+const user = "anonymous"
 let site = sessionStorage.getItem("site") || "unknown";
 sessionStorage.removeItem("locked");
 sessionStorage.setItem("locked", "false");
