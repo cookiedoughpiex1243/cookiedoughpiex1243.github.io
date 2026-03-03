@@ -3,31 +3,27 @@
     <head> 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
-        <meta name="description" content="Josh's site's page for logged in user to chat with user who is not signed in">
-        <link rel="stylesheet" href="resources/style.css">
-        <link rel="icon" href="resources/Cookie pfp 2.png">
-    
-        <script src="resources/chat.js"></script>
-        <script src="resources/loggedin.js" defer></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>pchat 2</title>
+        <script src="resources/chat.js" defer></script>
         <script>
-            sessionStorage.setItem("site", "schat");
-            sessionStorage.setItem("locked", "true");
+            sessionStorage.setItem("site", "schat")
+        
         </script>
-        <title>User chat | Josh's site</title>
+        <link rel="stylesheet" href="resources/style.css">
+        <link rel="icon" type="image/x-icon" href="resources/Cookie pfp 2.png" style="border-radius: 6px;">
     </head>
-    <body>
-        <div class="boxoverlay" style="display: block; z-index: 0;">
-            <div class="box">
-                <h2 class="glow-cyan">Chat maybe?</h2>
-                <textarea class="login-input" id="userMsg1" rows="5" placeholder="Type here and press Enter, the 'Sync' Button or tap anywhere else to send."></textarea>
-                <button class="download-btn" onclick="pushUpdate()">Sync</button>
-                <textarea id="displayArea2" class="login-input" rows="5" readonly style="border-style: dashed; opacity: 0.7;" placeholder="Connecting..."></textarea>
-                <p id="status" style="color: #00ffff; font-size: 12px; margin-top: 15px;">Connecting...</p>
-
-            </div>
+    <body class="chatsite">
+        <div class="cwrapper">
+             <div class="messageBox">
+                <h4 style="color:red">System</h4>
+                    Type and press Enter or the send button to send messages.
+                <h6>Sent at 12:00 PM</h6>
+            </div>     
+        </div>  
+        <div class="inputbox"><textarea id="userMsg2" class="login-input" type="text" placeholder="Type a message..."></textarea>
+            <button class="download-btn" id="sendbtn">Send</button>
         </div>
-        <div class="backbuttonc">
-            <a href="loggedin" class="back-button">Back</a>
-        </div>
+            
     </body>
 </html>

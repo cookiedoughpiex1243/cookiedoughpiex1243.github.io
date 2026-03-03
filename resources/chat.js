@@ -1,84 +1,115 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+const messageInput = document.getElementById('userMsg2');
+const wrapper = document.querySelector('.cwrapper');
+const sendbtn = document.getElementById('sendbtn');
+const user = "anonymous"
+let site = sessionStorage.getItem("site") || "unknown";
+sessionStorage.removeItem("locked");
+sessionStorage.setItem("locked", "false");
 
-// 1. We define the config outside so functions can use it, 
-// but we fill it with data inside the listener.
-let chatConfig = {};
 
-async function loadChat() {
-    if (!chatConfig || !chatConfig.displayId) return;
-
-    const displayArea = document.getElementById(chatConfig.displayId);
-    if (!displayArea)
-        return;
-
-    try {
-        const response = await fetch(`${CLOUD_URL}${chatConfig.loadRoute}`);
-        const data = await response.json();
-        
-        // Anti-flicker: Only update if the content actually changed
-        //if (displayArea && displayArea.value !== data.message) {
-           displayArea.value = data.message || "Connected, waiting for messages...\nType in the box below to send.";
-           if (document.getElementById("status").innerText === "Connecting...") {
-           document.getElementById("status").innerText = document.getElementById("status").innerText === "Connecting..." ? "Connected!" :
-           document.getElementById("status").innerText;
-           setTimeout(() => {
-            document.getElementById("status").innerText = "";
-            }, 750);
-        }
-       // }
-    } catch (err) {
-        console.error("Load error:", err);
-    }
+function boxDelay () {
+    setTimeout(() => {
+    document.body.style.display = "flex";
+    }, 500);
 }
+boxDelay();
 
-async function pushUpdate() {
-    if (!chatConfig.inputId) return;
+// Force site update based on URL to prevent stale session data
+if (window.location.href.includes("pchat")) site = "pchat";
+else if (window.location.href.includes("schat")) site = "schat";
 
-    const input = document.getElementById(chatConfig.inputId);
+messageInput.addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        sendMessage();}
+});
+
+async function sendMessage() {
+    const message = messageInput.value;
+    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    if (message === '') return;
+    if (message === "/logout") {
+        localStorage.removeItem('loggedIn');
+        sessionStorage.removeItem('loggedIn');
+        sessionStorage.setItem('site', 'login');
+        window.location.replace("login");
+ } 
+    
+
     try {
-        await fetch(`${CLOUD_URL}${chatConfig.saveRoute}`, {
+        await fetch(`${CLOUD_URL}/savecdata1`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: input.value })
+            body: JSON.stringify({
+                text: message,
+                timestamp: time,
+                sender: sessionStorage.getItem("user") || "anonymous"
+            })
         });
-        console.log("Push successful!");
-        loadChat(); 
+        messageInput.value = '';
+        loadMessages();
     } catch (err) {
-        console.error("Push error:", err);
+        console.error("Error sending message:", err);
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const isPChat = sessionStorage.getItem("site") === "pchat";
 
-    chatConfig = isPChat ? {
-        inputId: 'userMsg2',
-        displayId: 'displayArea1',
-        saveRoute: '/savecdata2',
-        loadRoute: '/loadcdata1'
-    } : {
-        inputId: 'userMsg1',
-        displayId: 'displayArea2',
-        saveRoute: '/savecdata1',
-        loadRoute: '/loadcdata2'
-    };
-    
-    
-    loadChat();
-    setInterval(loadChat, 750);
+sendbtn.addEventListener('click', sendMessage);
 
-    const input = document.getElementById(chatConfig.inputId);
-    if (input) {
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                pushUpdate();
-                document.getElementById("status").style.color = "#39ff14";
-                document.getElementById("status").innerText = "Sent!";
-                setTimeout(() => {
-                    document.getElementById("status").innerText = "";
-                }, 2000);
+
+
+let lastMsgCount = 0;
+async function loadMessages() {
+    try {
+        const res = await fetch(`${CLOUD_URL}/loadcdata1`);
+        const messages = await res.json();
+        if (messages.length > lastMsgCount) {
+            if (!wrapper) return;
+
+            for (let i = lastMsgCount; i < messages.length; i++) {
+                const msg = messages[i];
+                if (!msg) continue;
+                const sender = msg.sender || "anonymous";
+                const senderLower = sender.toLowerCase();
+
+                // Determine if the message should be aligned to the right.
+                const alignRight = (site === 'pchat' && senderLower === 'anonymous') || (site === 'schat' && senderLower === 'josh');
+
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('messageBox');
+                if (alignRight) {
+                    messageElement.style.marginLeft = "auto";
+                }
+                
+                const user = senderLower === "josh" ? "Josh" : "pChat";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
+                messageElement.innerHTML = `
+                    <h4 style="${senderLower === "anonymous" ? "color: #ea00ff" : "color: #00ffff"}">${user}</h4>
+                    <p class="messageText"></p>
+                    <h6 class="timestamp">${msg.timestamp || ""}</h6>
+                `;
+                messageElement.querySelector('.messageText').textContent = msg.text || "";
+                wrapper.appendChild(messageElement);
+
             }
-        });
-        input.addEventListener('blur', pushUpdate);
+            wrapper.scrollTop = wrapper.scrollHeight;
+            lastMsgCount = messages.length;
+        }
+    } catch (err) {
+        console.error(err);
     }
-});
+}
+
+async function clearChat() {
+    if (!confirm("Delete all messages for everyone?")) return;
+
+    try {
+        await fetch(`${CLOUD_URL}/deletecdata1`, { method: 'DELETE' });
+        wrapper.innerHTML = ''; // Clear the screen immediately
+    } catch (err) {
+        console.error("Failed to clear chat:", err);
+    }
+}
+
+loadMessages();
+setInterval(loadMessages, 750);
