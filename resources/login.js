@@ -1,6 +1,8 @@
 if (!sessionStorage.getItem("site")) {
     sessionStorage.setItem("site", "login");
 };
+const message = document.getElementById('message');
+
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -14,7 +16,6 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   const user = document.getElementById('username');
   const uservalue = user.value.toLowerCase();
   const pass = document.getElementById('password');
-  const message = document.getElementById('message');
   const correctHash = uservalue === "josh" ? "16405e094d8fdfc89494dcaff572a3a5e119bd6696f8d7ed2082df87a0339ff8" : "61f40cae069b5dd76e75f78c68941defc0645af7039228c434f2fb10add6bb32";
   const inputHash = await hashPassword(pass.value);
   if ((uservalue === "josh" || uservalue === "emma") && inputHash === correctHash) {
@@ -40,7 +41,9 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     }
   }
   else {
+    setTimeout (() => {
     window.location.href = "echat";
+    message.innerText = ""}, 750);
   }
 }
   else {
