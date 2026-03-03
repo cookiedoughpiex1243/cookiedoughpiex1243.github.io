@@ -80,6 +80,7 @@ async function loadMessages() {
                 messageElement.classList.add('messageBox');
                 if (alignRight) {
                     messageElement.style.marginLeft = "auto";
+                    site === "echat" ? messageElement.style.border = "1px solid #ea00ff" : null;
                 }
                 
                 const user = senderLower === "josh" ? "Josh" : "Echat";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.

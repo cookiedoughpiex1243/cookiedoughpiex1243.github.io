@@ -2,8 +2,8 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
-const user = "anonymous"
 let site = sessionStorage.getItem("site") || "unknown";
+const user = site === "pchat" ? "anonymous" : "josh";
 sessionStorage.removeItem("locked");
 sessionStorage.setItem("locked", "false");
 
@@ -44,7 +44,7 @@ async function sendMessage() {
             body: JSON.stringify({
                 text: message,
                 timestamp: time,
-                sender: sessionStorage.getItem("user") || "anonymous"
+                sender: user,
             })
         });
         messageInput.value = '';
@@ -80,9 +80,10 @@ async function loadMessages() {
                 messageElement.classList.add('messageBox');
                 if (alignRight) {
                     messageElement.style.marginLeft = "auto";
+                    site === "echat" ? messageElement.style.border = "1px solid #ea00ff" : null;
                 }
                 
-                const user = senderLower === "josh" ? "Josh" : "pChat";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
+                const user = senderLower === "josh" ? "Josh" : "Anonymous";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
                 messageElement.innerHTML = `
                     <h4 style="${senderLower === "anonymous" ? "color: #ea00ff" : "color: #00ffff"}">${user}</h4>
                     <p class="messageText"></p>
