@@ -2,7 +2,7 @@ const lock = sessionStorage.getItem("locked");
 const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("loggedIn");
 
 if (loggedIn === lock ) {
-  document.body.style.display = "flex";
+  document.body.style = "display: flex";
 }
 else {
   window.location.replace("login");
