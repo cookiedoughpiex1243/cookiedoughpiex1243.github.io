@@ -4,6 +4,7 @@ const socket = io(CLOUD_URL);
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
+const message = messageInput.value.trim();
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
@@ -37,7 +38,7 @@ messageInput.addEventListener('keypress', function(event) {
 });
 
 async function sendMessage() {
-    const message = messageInput.value.trim();
+    
     if (message === '') return;
 
     if (message === "/logout") {
@@ -61,8 +62,8 @@ async function sendMessage() {
     .replaceAll(":surprised:", "😮")
     .replaceAll(":cool:", "😎")
     .replaceAll(":sweat:", "😅")
-    .replaceAll(":pensive", "😅")
-    ;
+    .replaceAll(":pensive", "😅");
+    
 
 
     const msgData = {
