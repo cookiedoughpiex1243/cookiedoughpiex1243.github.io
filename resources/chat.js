@@ -4,7 +4,6 @@ const socket = io(CLOUD_URL);
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
-const message = messageInput.value.trim();
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
@@ -36,9 +35,9 @@ messageInput.addEventListener('keypress', function(event) {
         sendMessage();
     }
 });
-
+let message;
 async function sendMessage() {
-    
+    message = messageInput.value.trim();
     if (message === '') return;
 
     if (message === "/logout") {
