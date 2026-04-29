@@ -83,6 +83,7 @@
  }
  
  .cwrapper {
+  
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -92,6 +93,7 @@
     margin-bottom: 4em;
     overflow-y: auto;
     box-sizing: border-box;
+    scroll-behavior: smooth;
  }
  .cwrapper::-webkit-scrollbar {
     display: none;
@@ -180,7 +182,7 @@ margin-bottom: 0px;
       flex: 1;
       flex-direction: column;
       width: 100%;
-      height: 100vh;
+      height: 100%;
     }
     
     .wrapper {
