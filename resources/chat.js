@@ -24,6 +24,8 @@ socket.on('receive_message', (msg) => {
     renderMessage(msg);
 });
 
+'<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Press ENTER or the Send button to send Messages</div>';
+
 // Listen for chat clearing
 socket.on('chat_cleared', () => {
     wrapper.innerHTML = '<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Messages Deleted<h6>Recently</h6></div>';
@@ -53,7 +55,7 @@ async function sendMessage() {
     .replaceAll(":grin:", "😄")
     .replaceAll(":sad:", "😢")
     .replaceAll(":heart:", "❤️")
-    .replaceAll(":+1:", "👍")
+    .replaceAll((":+1:" || ":thumbsup:"), "👍")
     .replaceAll(":rofl:", "🤣")
     .replaceAll(":wink:", "😉")
     .replaceAll(":sob:", "😭")
@@ -61,7 +63,7 @@ async function sendMessage() {
     .replaceAll(":surprised:", "😮")
     .replaceAll(":cool:", "😎")
     .replaceAll(":sweat:", "😅")
-    .replaceAll(":pensive", "😅");
+    .replaceAll(":pensive", "😔");
     
 
 
