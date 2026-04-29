@@ -11,7 +11,7 @@ const user = sessionStorage.getItem("user") || "anonymous";
 // Determine which chat "room" or channel to use
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
-// Show the body after a small delay (keeping your original logic)
+// Show the body after a small delay
 setTimeout(() => {
     document.body.style.display = "flex";
 }, 500);
@@ -71,7 +71,7 @@ function renderMessage(msg) {
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     
-    // Determine alignment based on user identity and site
+    // Determine alignment: "Me" is always on the right
     const isMe = (user.toLowerCase() === senderLower);
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
@@ -83,8 +83,9 @@ function renderMessage(msg) {
         }
     }
 
+    // Color Logic: Josh is Blue (#00ffff), Others are Pink (#ea00ff)
     const displayName = senderLower === "josh" ? "Josh" : (senderLower === "emma" ? "Emma" : "Anonymous");
-    const nameColor = (senderLower === "emma" || senderLower === "anonymous") ? "#ea00ff" : "#00ffff";
+    const nameColor = (senderLower === "josh") ? "#00ffff" : "#ea00ff";
 
     messageElement.innerHTML = `
         <h4 style="color: ${nameColor}">${displayName}</h4>
@@ -102,7 +103,7 @@ async function loadHistory() {
     try {
         const res = await fetch(`${CLOUD_URL}/${endpoint}`);
         const messages = await res.json();
-        wrapper.innerHTML = ''; // Clear initial system message if preferred
+        wrapper.innerHTML = ''; 
         messages.forEach(renderMessage);
     } catch (err) {
         console.error("Failed to load history:", err);

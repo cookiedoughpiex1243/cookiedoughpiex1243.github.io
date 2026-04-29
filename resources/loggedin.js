@@ -15,14 +15,20 @@ function logoutbtn () {
   document.body.insertAdjacentHTML('beforeend', lobtn);
 }
 
-sessionStorage.getItem("site") !== "jchat" && sessionStorage.getItem("site") !== "echat" ? logoutbtn() : null;
+// Hide logout button on all chat sites
+const chatSites = ["jchat", "echat", "pchat", "schat"];
+const currentSite = sessionStorage.getItem("site");
+
+if (!chatSites.includes(currentSite)) {
+    logoutbtn();
+}
+
 const lob = document.getElementById("logout");
 document.addEventListener('click', function(e) {
   if (e.target == lob) {
     localStorage.removeItem('loggedIn');
     sessionStorage.removeItem('loggedIn');
     sessionStorage.setItem('site', 'login');
+    sessionStorage.setItem("locked", "false");
     window.location.replace("login");
   }});
-
-
