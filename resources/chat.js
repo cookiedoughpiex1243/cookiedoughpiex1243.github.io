@@ -50,6 +50,10 @@ async function sendMessage() {
         message = '';
         return;
     }
+     if (message === "/clearAll") {
+        socket.emit("clear_chat")
+        message = '';
+     }
     //Emoji Replacement Logic :D
     message = message
     .replaceAll(":grin:", "😄")
