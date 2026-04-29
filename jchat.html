@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head> 
-        <title>WIP Site 1</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="resources/loggedin.js" defer></script>
-        <script src="resources/echat.js" defer></script>
-        
-        <script>
-            sessionStorage.setItem("user", "josh");
-            sessionStorage.setItem("site", "jchat");
-            sessionStorage.setItem("locked", "josh");
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat | Josh</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="resources/chat.js" defer></script>
+    <script src="resources/loggedin.js" defer></script>
+    <script>
+        sessionStorage.setItem("user", "josh");
+        sessionStorage.setItem("site", "jchat");
+        sessionStorage.setItem("locked", "josh");
 
-            window.addEventListener('load', () => {
+        window.addEventListener('load', () => {
             setTimeout(() => {
                 const input = document.getElementById("userMsg2");
-                if (input) {
-                    input.focus();
-                }
+                if (input) input.focus();
             }, 600); 
         });
-        </script>
-        
-        <link rel="stylesheet" href="resources/style.css">
-        <link rel="icon" type="image/x-icon" href="resources/Cookie pfp 2.png" style="border-radius: 6px;">
-    </head>
-    <body class="chatsite" style="display: none;">
-        <div class="cwrapper">
-             <div class="messageBox" style="border:2px solid red">
-                <h4 style="color:red">System</h4>
-                    Type and press Enter or the send button to send messages.
-                <h6>Sent at 12:00 PM</h6>
-            </div>
-        </div>  
-        <div class="inputbox"><textarea id="userMsg2" class="login-input" type="text" placeholder="Type a message..."></textarea>
-            <button class="download-btn" id="sendbtn">Send</button>
+    </script>
+    <link rel="stylesheet" href="resources/style.css">
+    <link rel="icon" type="image/x-icon" href="resources/Cookie pfp 2.png">
+</head>
+<body class="chatsite" style="display: none;">
+    <div class="cwrapper">
+         <div class="messageBox" style="border:2px solid red">
+            <h4 style="color:red">System</h4>
+                Type and press Enter or the send button to send messages.
+            <h6>Sent at 12:00 PM</h6>
         </div>
-            
-    </body>
+    </div>  
+    <div class="inputbox">
+        <textarea id="userMsg2" class="login-input" placeholder="Type a message..."></textarea>
+        <button class="download-btn" id="sendbtn">Send</button>
+    </div>
+    <div class="backbuttonc" style="position: fixed; bottom: 80px; left: 10px; transform: none; width: auto;">
+        <a href="loggedin" class="back-button">Back</a>
+    </div>
+</body>
 </html>

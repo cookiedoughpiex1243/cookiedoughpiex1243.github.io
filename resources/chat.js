@@ -1,116 +1,112 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+const socket = io(CLOUD_URL);
+
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
-let site = sessionStorage.getItem("site") || "unknown";
-const user = site === "pchat" ? "anonymous" : "josh";
-sessionStorage.removeItem("locked");
-sessionStorage.setItem("locked", "false");
 
+const site = sessionStorage.getItem("site") || "unknown";
+const user = sessionStorage.getItem("user") || "anonymous";
 
-function boxDelay () {
-    setTimeout(() => {
+// Determine which chat "room" or channel to use
+const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
+
+// Show the body after a small delay (keeping your original logic)
+setTimeout(() => {
     document.body.style.display = "flex";
-    }, 500);
-}
-boxDelay();
+}, 500);
 
-// Force site update based on URL to prevent stale session data
-if (window.location.href.includes("pchat")) site = "pchat";
-else if (window.location.href.includes("schat")) site = "schat";
+// Join the appropriate room on connection
+socket.emit('join_room', chatType);
+
+// Listen for new messages
+socket.on('receive_message', (msg) => {
+    renderMessage(msg);
+});
+
+// Listen for chat clearing
+socket.on('chat_cleared', () => {
+    wrapper.innerHTML = '<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Messages Deleted<h6>Recently</h6></div>';
+});
 
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
-        sendMessage();}
+        sendMessage();
+    }
 });
 
 async function sendMessage() {
-    const message = messageInput.value;
-    const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const message = messageInput.value.trim();
     if (message === '') return;
+
     if (message === "/logout") {
         localStorage.removeItem('loggedIn');
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
- } 
-    
+        return;
+    }
+
+    const msgData = {
+        text: message,
+        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        sender: user,
+        room: chatType
+    };
 
     try {
-        await fetch(`${CLOUD_URL}/savecdata1`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                text: message,
-                timestamp: time,
-                sender: user,
-            })
-        });
+        socket.emit('send_message', msgData);
         messageInput.value = '';
-        loadMessages();
     } catch (err) {
         console.error("Error sending message:", err);
     }
 }
 
-
 sendbtn.addEventListener('click', sendMessage);
 
+function renderMessage(msg) {
+    if (!wrapper || !msg) return;
 
-
-let lastMsgCount = 0;
-async function loadMessages() {
-    try {
-        const res = await fetch(`${CLOUD_URL}/loadcdata1`);
-        const messages = await res.json();
-        if (messages.length > lastMsgCount) {
-            if (!wrapper) return;
-
-            for (let i = lastMsgCount; i < messages.length; i++) {
-                const msg = messages[i];
-                if (!msg) continue;
-                const sender = msg.sender || "anonymous";
-                const senderLower = sender.toLowerCase();
-
-                // Determine if the message should be aligned to the right.
-                const alignRight = (site === 'pchat' && senderLower === 'anonymous') || (site === 'schat' && senderLower === 'josh');
-
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('messageBox');
-                if (alignRight) {
-                    messageElement.style.marginLeft = "auto";
-                    site === "echat" ? messageElement.style.border = "1px solid #ea00ff" : null;
-                }
-                
-                const user = senderLower === "josh" ? "Josh" : "Anonymous";   //sender.charAt(0).toUpperCase() + sender.slice(1); //uhh 0th letter capitalised + every other letter after first one.
-                messageElement.innerHTML = `
-                    <h4 style="${senderLower === "anonymous" ? "color: #ea00ff" : "color: #00ffff"}">${user}</h4>
-                    <p class="messageText"></p>
-                    <h6 class="timestamp">${msg.timestamp || ""}</h6>
-                `;
-                messageElement.querySelector('.messageText').textContent = msg.text || "";
-                wrapper.appendChild(messageElement);
-
-            }
-            wrapper.scrollTop = wrapper.scrollHeight;
-            lastMsgCount = messages.length;
+    const sender = msg.sender || "anonymous";
+    const senderLower = sender.toLowerCase();
+    
+    // Determine alignment based on user identity and site
+    const isMe = (user.toLowerCase() === senderLower);
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('messageBox');
+    
+    if (isMe) {
+        messageElement.style.marginLeft = "auto";
+        if (site === "echat" || site === "jchat") {
+             messageElement.style.border = "1px solid #ea00ff";
         }
-    } catch (err) {
-        console.error(err);
     }
+
+    const displayName = senderLower === "josh" ? "Josh" : (senderLower === "emma" ? "Emma" : "Anonymous");
+    const nameColor = (senderLower === "emma" || senderLower === "anonymous") ? "#ea00ff" : "#00ffff";
+
+    messageElement.innerHTML = `
+        <h4 style="color: ${nameColor}">${displayName}</h4>
+        <p class="messageText"></p>
+        <h6 class="timestamp">${msg.timestamp || ""}</h6>
+    `;
+    messageElement.querySelector('.messageText').textContent = msg.text || "";
+    wrapper.appendChild(messageElement);
+    wrapper.scrollTop = wrapper.scrollHeight;
 }
 
-async function clearChat() {
-    if (!confirm("Delete all messages for everyone?")) return;
-
+// Initial load of history via REST (one-time)
+async function loadHistory() {
+    const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
-        await fetch(`${CLOUD_URL}/deletecdata1`, { method: 'DELETE' });
-        wrapper.innerHTML = 'Messages Deleted'; // Clear the screen immediately
+        const res = await fetch(`${CLOUD_URL}/${endpoint}`);
+        const messages = await res.json();
+        wrapper.innerHTML = ''; // Clear initial system message if preferred
+        messages.forEach(renderMessage);
     } catch (err) {
-        console.error("Failed to clear chat:", err);
+        console.error("Failed to load history:", err);
     }
 }
 
-loadMessages();
-setInterval(loadMessages, 750);
+loadHistory();
