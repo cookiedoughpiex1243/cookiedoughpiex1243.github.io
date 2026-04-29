@@ -69,7 +69,7 @@ async function sendMessage() {
     .replaceAll(":surprised:", "😮")
     .replaceAll(":cool:", "😎")
     .replaceAll(":sweat:", "😅")
-    .replaceAll(":pensive:", "😔"); // Corrected to include colon
+    .replaceAll(":pensive:", "😔");
 
     const msgData = {
         text: processedMessage,
