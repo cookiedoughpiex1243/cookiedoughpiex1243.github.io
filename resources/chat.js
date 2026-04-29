@@ -135,12 +135,13 @@ async function loadHistory() {
 }
 
 let hasFocus = document.hasFocus();
-document.addEventListener('focus', () => {
-    hasFocus = true;
-    console.log("focused");
-});
-document.addEventListener('blur', () => {
-    hasFocus = false;
+document.addEventListener('visibilitychange', () => {
+    if(document.hidden)
+    hasFocus = false
     console.log("unfocused");
+    else
+    console.log("focused")
+    hasFocus = true;
 });
+
 loadHistory();
