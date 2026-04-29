@@ -8,26 +8,23 @@ const sendbtn = document.getElementById('sendbtn');
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
 
-// Determine which chat "room" or channel to use
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
-// Show the body after a small delay
+
 setTimeout(() => {
     document.body.style.display = "flex";
 }, 500);
 
 // Join the appropriate room on connection
 socket.emit('join_room', chatType);
-const notif = new Audio("notification.mp3");
+const notif = new Audio('notification.mp3');
 // Listen for new messages
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
-        notif.play();
+        notif.play().catch(e => console.warn("Audio play blocked:", e));
     }
 });
-
-'<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Press ENTER or the Send button to send Messages</div>';
 
 // Listen for chat clearing
 socket.on('chat_cleared', () => {
@@ -40,9 +37,8 @@ messageInput.addEventListener('keypress', function(event) {
         sendMessage();
     }
 });
-let message;
 async function sendMessage() {
-    message = messageInput.value.trim();
+    const message = messageInput.value.trim();
     if (message === '') return;
 
     if (message === "/logout") {
@@ -50,20 +46,22 @@ async function sendMessage() {
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
-        message = '';
+        messageInput.value = ''; // Corrected
         return;
     }
      if (message === "/clearAll") {
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
-        messageInput = '';
+        messageInput.value = ''; // Corrected
+        return;
      }
     //Emoji Replacement Logic :D
-    message = message
+    let processedMessage = message
+    .replaceAll(":+1:", "👍") // Corrected emoji replacement
+    .replaceAll(":thumbsup:", "👍")
     .replaceAll(":grin:", "😄")
     .replaceAll(":sad:", "😢")
     .replaceAll(":heart:", "❤️")
-    .replaceAll((":+1:" || ":thumbsup:"), "👍")
     .replaceAll(":rofl:", "🤣")
     .replaceAll(":wink:", "😉")
     .replaceAll(":sob:", "😭")
@@ -71,12 +69,10 @@ async function sendMessage() {
     .replaceAll(":surprised:", "😮")
     .replaceAll(":cool:", "😎")
     .replaceAll(":sweat:", "😅")
-    .replaceAll(":pensive", "😔");
-    
-
+    .replaceAll(":pensive:", "😔"); // Corrected to include colon
 
     const msgData = {
-        text: message,
+        text: processedMessage,
         timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         sender: user,
         room: chatType
@@ -141,8 +137,10 @@ async function loadHistory() {
 let hasFocus = document.hasFocus();
 document.addEventListener('focus', () => {
     hasFocus = true;
+    console.log("focused");
 });
 document.addEventListener('blur', () => {
     hasFocus = false;
+    console.log("unfocused");
 });
 loadHistory();
