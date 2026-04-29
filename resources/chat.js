@@ -106,7 +106,7 @@ async function clearChat() {
 
     try {
         await fetch(`${CLOUD_URL}/deletecdata1`, { method: 'DELETE' });
-        wrapper.innerHTML = ''; // Clear the screen immediately
+        wrapper.innerHTML = 'Messages Deleted'; // Clear the screen immediately
     } catch (err) {
         console.error("Failed to clear chat:", err);
     }

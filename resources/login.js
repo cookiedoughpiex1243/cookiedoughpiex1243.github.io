@@ -28,7 +28,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
        sessionStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
     }
     if (uservalue === "josh") {
-    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") !== "true") {
+    if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
     setTimeout (() => {
       window.location.href = "loggedin";
       message.innerText = ""}, 750);

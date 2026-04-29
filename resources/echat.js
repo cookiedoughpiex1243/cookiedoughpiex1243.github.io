@@ -111,5 +111,12 @@ async function clearChat() {
     }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    if (sessionStorage.getItem("site") !== "echat") {
+        document.getElementById("userMsg2").focus(); 
+    }
+});
+
+
 loadMessages();
 setInterval(loadMessages, 750);

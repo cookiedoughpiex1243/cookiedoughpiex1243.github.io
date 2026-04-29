@@ -10,6 +10,9 @@ if (user === "josh" || user === "emma") {
     const target = (user === "josh") ? "loggedin" : "echat";
     window.location.replace(target);
 }
+      document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("username").focus(); 
+      });
   </script>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" 
