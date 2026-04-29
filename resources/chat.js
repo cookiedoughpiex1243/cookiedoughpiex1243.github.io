@@ -18,7 +18,7 @@ setTimeout(() => {
 
 // Join the appropriate room on connection
 socket.emit('join_room', chatType);
-const notif = new Audio(notification.mp3);
+const notif = new Audio("notification.mp3");
 // Listen for new messages
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
