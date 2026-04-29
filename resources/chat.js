@@ -18,10 +18,13 @@ setTimeout(() => {
 
 // Join the appropriate room on connection
 socket.emit('join_room', chatType);
-
+const notif = new Audio(resources/Notification.mp3);
 // Listen for new messages
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
+    if(!hasFocus) {
+        notif.play();
+    }
 });
 
 // Listen for chat clearing
@@ -111,4 +114,11 @@ async function loadHistory() {
     }
 }
 
+let hasFocus = document.hasFocus();
+document.addEventListener('focus', () => {
+    hasFocus = true;
+});
+document.addEventListener('blur', () => {
+    hasFocus = false;
+});
 loadHistory();
