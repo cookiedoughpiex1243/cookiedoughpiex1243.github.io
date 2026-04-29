@@ -45,8 +45,21 @@ async function sendMessage() {
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
+        message = '';
         return;
     }
+    //Emoji Replacement Logic
+    message = message
+    .replaceAll(":grin:", "😄")
+    .replaceAll(":sad:", "😢")
+    .replaceAll(":heart:", "❤️")
+    .replaceAll(":+1:", "👍")
+    .replaceAll(":laugh:", "😂")
+    .replaceAll(":wink:", "😉")
+    .replaceAll(":sob:", "😭")
+    .replaceAll(":angry:", "😠")
+    .replaceAll(":surprised:", "😮")
+    .replaceAll(":cool:", "😎");
 
     const msgData = {
         text: message,
