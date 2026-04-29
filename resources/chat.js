@@ -48,7 +48,7 @@ async function sendMessage() {
         message = '';
         return;
     }
-    //Emoji Replacement Logic
+    //Emoji Replacement Logic :D
     message = message
     .replaceAll(":grin:", "😄")
     .replaceAll(":sad:", "😢")
