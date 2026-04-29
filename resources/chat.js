@@ -73,22 +73,23 @@ function renderMessage(msg) {
     
     // Determine alignment: "Me" is always on the right
     const isMe = (user.toLowerCase() === senderLower);
+    const isJosh = (senderLower === "josh");
+
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
     
     if (isMe) {
         messageElement.style.marginLeft = "auto";
-        if (site === "echat" || site === "jchat") {
-             messageElement.style.border = "1px solid #ea00ff";
-        }
     }
 
     // Color Logic: Josh is Blue (#00ffff), Others are Pink (#ea00ff)
-    const displayName = senderLower === "josh" ? "Josh" : (senderLower === "emma" ? "Emma" : "Anonymous");
-    const nameColor = (senderLower === "josh") ? "#00ffff" : "#ea00ff";
+    const themeColor = isJosh ? "#00ffff" : "#ea00ff";
+    messageElement.style.border = `2px solid ${themeColor}`;
+
+    const displayName = isJosh ? "Josh" : (senderLower === "emma" ? "Emma" : "Anonymous");
 
     messageElement.innerHTML = `
-        <h4 style="color: ${nameColor}">${displayName}</h4>
+        <h4 style="color: ${themeColor}">${displayName}</h4>
         <p class="messageText"></p>
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
