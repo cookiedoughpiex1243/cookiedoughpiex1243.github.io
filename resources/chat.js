@@ -27,6 +27,8 @@ socket.on('receive_message', (msg) => {
     }
 });
 
+'<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Press ENTER or the Send button to send Messages</div>';
+
 // Listen for chat clearing
 socket.on('chat_cleared', () => {
     wrapper.innerHTML = '<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Messages Deleted<h6>Recently</h6></div>';
@@ -38,9 +40,9 @@ messageInput.addEventListener('keypress', function(event) {
         sendMessage();
     }
 });
-
+let message;
 async function sendMessage() {
-    const message = messageInput.value.trim();
+    message = messageInput.value.trim();
     if (message === '') return;
 
     if (message === "/logout") {
@@ -48,8 +50,30 @@ async function sendMessage() {
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
+        message = '';
         return;
     }
+     if (message === "/clearAll") {
+        socket.emit("clear_chat", chatType);
+        console.log("chat cleared");
+        messageInput = '';
+     }
+    //Emoji Replacement Logic :D
+    message = message
+    .replaceAll(":grin:", "😄")
+    .replaceAll(":sad:", "😢")
+    .replaceAll(":heart:", "❤️")
+    .replaceAll((":+1:" || ":thumbsup:"), "👍")
+    .replaceAll(":rofl:", "🤣")
+    .replaceAll(":wink:", "😉")
+    .replaceAll(":sob:", "😭")
+    .replaceAll(":angry:", "😠")
+    .replaceAll(":surprised:", "😮")
+    .replaceAll(":cool:", "😎")
+    .replaceAll(":sweat:", "😅")
+    .replaceAll(":pensive", "😔");
+    
+
 
     const msgData = {
         text: message,
