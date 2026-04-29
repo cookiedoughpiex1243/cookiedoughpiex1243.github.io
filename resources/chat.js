@@ -54,12 +54,16 @@ async function sendMessage() {
     .replaceAll(":sad:", "😢")
     .replaceAll(":heart:", "❤️")
     .replaceAll(":+1:", "👍")
-    .replaceAll(":laugh:", "😂")
+    .replaceAll(":rofl:", "🤣")
     .replaceAll(":wink:", "😉")
     .replaceAll(":sob:", "😭")
     .replaceAll(":angry:", "😠")
     .replaceAll(":surprised:", "😮")
-    .replaceAll(":cool:", "😎");
+    .replaceAll(":cool:", "😎")
+    .replaceAll(":sweat:", "😅")
+    .replaceAll(":pensive", "😅")
+    ;
+
 
     const msgData = {
         text: message,
