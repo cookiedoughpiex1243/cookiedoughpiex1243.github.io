@@ -51,8 +51,9 @@ async function sendMessage() {
         return;
     }
      if (message === "/clearAll") {
-        socket.emit("clear_chat")
-        message = '';
+        socket.emit("clear_chat", chatType);
+        console.log("chat cleared");
+        messageInput = '';
      }
     //Emoji Replacement Logic :D
     message = message
