@@ -20,6 +20,13 @@ socket.emit('join_room', chatType);
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;
 let newMsgs = 0;
+//Da thing to make sure sound not autoblocked
+document.addEventListener('click', () => {
+    notificationSound.play().then(() => {
+        notificationSound.pause();
+        notificationSound.currentTime = 0;
+    }).catch(e => console.log("Audio not ready yet"));
+}, { once: true });
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
