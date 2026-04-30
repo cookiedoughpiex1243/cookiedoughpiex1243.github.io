@@ -49,15 +49,18 @@ messageInput.addEventListener('keypress', function(event) {
         sendMessage();
     }
 });
-
+let isTyping = false;
 messageInput.addEventListener("input", () => {
+    clearTimeout(typingTimeout);
     const typingData = {
         room : chatType,
         user : user,
     }
-    socket.emit("typing", typingData);
+    if(!isTyping) {
+        isTyping = true;
+        socket.emit("typing", typingData);}
     typingTimeout = setTimeout(() => {
-        socket.emit('stop_typing', { room: chatType, user: user });
+        socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
     }, 2000);
 });
 socket.on("display_typing", () => {
@@ -68,7 +71,7 @@ socket.on("hide_typing", () => {
     console.log("stopping typing");
     typeIndicator.style.display = "none";   
 });
- 
+
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
