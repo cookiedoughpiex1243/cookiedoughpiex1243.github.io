@@ -18,11 +18,13 @@ setTimeout(() => {
 // Join the appropriate room on connection
 socket.emit('join_room', chatType);
 const notif = new Audio('resources/notification.mp3');
-// Listen for new messages
+const defaultTitle = document.title;
+let newMsgs = 0;
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
         notif.play().catch(e => console.warn("Audio play blocked:", e));
+        document.title = `(${++newMsgs}) ${defaultTitle}`;
     }
 });
 
@@ -134,6 +136,7 @@ async function loadHistory() {
     }
 }
 
+
 let hasFocus = document.hasFocus();
 document.addEventListener('visibilitychange', () => {
     if(document.hidden){
@@ -141,6 +144,8 @@ document.addEventListener('visibilitychange', () => {
     console.log("unfocused");}
     else{
     console.log("focused")
+    document.title = defaultTitle;
+    newMsgs = 0;
     hasFocus = true;}
 });
 
