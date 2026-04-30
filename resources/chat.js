@@ -58,9 +58,8 @@ messageInput.addEventListener('keypress', function(event) {
     }, 2000);
 });
 socket.on("display_typing", (data)=> {
-    if(data.room === chatType && data.user != user){
+    
         typeIndicator.style.display = "flex";
-    }
 })
 socket.on("hide_typing"), () => {
     typeIndicator.style.display = "none";
