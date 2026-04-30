@@ -76,7 +76,7 @@ socket.on("hide_typing", () => {
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
-
+    socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
     if (message === "/logout") {
         localStorage.removeItemtypeIndicator.style.display = "none";
     setTimeout(() => {isTyping = false;}, 100);('loggedIn');
@@ -87,7 +87,7 @@ async function sendMessage() {
         return;
     }
     
-    socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
+    
     if (message === "/clearAll") {
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
