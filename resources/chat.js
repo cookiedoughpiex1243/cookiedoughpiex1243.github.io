@@ -48,6 +48,9 @@ messageInput.addEventListener('keypress', function(event) {
         event.preventDefault();
         sendMessage();
     }
+});
+
+messageInput.addEventListener("input", () => {
     const typingData = {
         room : chatType,
         user : user,
@@ -63,8 +66,9 @@ socket.on("display_typing", () => {
 });
 socket.on("hide_typing", () => {
     console.log("stopping typing");
-    typeIndicator.style.display = "none";
+    typeIndicator.style.display = "none";   
 });
+ 
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
