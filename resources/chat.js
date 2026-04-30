@@ -57,13 +57,14 @@ messageInput.addEventListener('keypress', function(event) {
         socket.emit('stop_typing', { room: chatType, user: user });
     }, 2000);
 });
-socket.on("display_typing", (data)=> {
-    
-        typeIndicator.style.display = "flex";
-})
-socket.on("hide_typing"), () => {
+socket.on("display_typing", () => {
+    console.log("displaying typing")
+    typeIndicator.style.display = "flex";
+});
+socket.on("hide_typing", () => {
+    console.log("stopping typing");
     typeIndicator.style.display = "none";
-}
+});
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
