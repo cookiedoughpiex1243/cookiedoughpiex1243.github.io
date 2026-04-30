@@ -4,9 +4,11 @@ const socket = io(CLOUD_URL);
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
+const typeIndicator = document.getElementById("typing-indicator");
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
+
 
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
@@ -40,12 +42,29 @@ socket.on('chat_cleared', () => {
     wrapper.innerHTML = '<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Messages Deleted<h6>Recently</h6></div>';
 });
 
+let typingTimeout;
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
         event.preventDefault();
         sendMessage();
     }
+    const typingData = {
+        room = chatType,
+        user = user,
+    }
+    socket.emit("typing", typingData);
+    typingTimeout = setTimeout(() => {
+        socket.emit('stop_typing', { room: chatType, user: user });
+    }, 2000);
 });
+socket.on("display_typing", (data)=> {
+    if(data.room === chatType && data.user != user){
+        typeIndicator.style.display = "flex";
+    }
+})
+socket.on("hide_typing"), () => {
+    typeIndicator.style.display = "none";
+}
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') return;
@@ -155,5 +174,7 @@ document.addEventListener('visibilitychange', () => {
     newMsgs = 0;
     hasFocus = true;}
 });
+
+
 
 loadHistory();
