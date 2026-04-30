@@ -45,6 +45,8 @@ socket.on('chat_cleared', () => {
 let typingTimeout;
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
+        isTyping = false;
+        typeIndicator.style.display = "none";
         event.preventDefault();
         sendMessage();
     }
