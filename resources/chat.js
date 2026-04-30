@@ -49,8 +49,8 @@ messageInput.addEventListener('keypress', function(event) {
         sendMessage();
     }
     const typingData = {
-        room = chatType,
-        user = user,
+        room : chatType,
+        user : user,
     }
     socket.emit("typing", typingData);
     typingTimeout = setTimeout(() => {
