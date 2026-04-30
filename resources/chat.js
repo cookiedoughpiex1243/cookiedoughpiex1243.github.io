@@ -85,8 +85,9 @@ async function sendMessage() {
         messageInput.value = ''; // Corrected
         return;
     }
-    isTyping = false;
+    
     typeIndicator.style.display = "none";
+    setTimeout(() => {isTyping = false;}, 100);
     if (message === "/clearAll") {
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
