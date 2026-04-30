@@ -78,7 +78,8 @@ async function sendMessage() {
     if (message === '') return;
 
     if (message === "/logout") {
-        localStorage.removeItem('loggedIn');
+        localStorage.removeItemtypeIndicator.style.display = "none";
+    setTimeout(() => {isTyping = false;}, 100);('loggedIn');
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
@@ -86,8 +87,7 @@ async function sendMessage() {
         return;
     }
     
-    typeIndicator.style.display = "none";
-    setTimeout(() => {isTyping = false;}, 100);
+    socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
     if (message === "/clearAll") {
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
