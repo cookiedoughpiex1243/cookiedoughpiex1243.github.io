@@ -45,8 +45,7 @@ socket.on('chat_cleared', () => {
 let typingTimeout;
 messageInput.addEventListener('keypress', function(event) {
     if (event.key === 'Enter') {
-        isTyping = false;
-        typeIndicator.style.display = "none";
+        
         event.preventDefault();
         sendMessage();
     }
@@ -86,7 +85,9 @@ async function sendMessage() {
         messageInput.value = ''; // Corrected
         return;
     }
-     if (message === "/clearAll") {
+    isTyping = false;
+    typeIndicator.style.display = "none";
+    if (message === "/clearAll") {
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
         messageInput.value = ''; // Corrected
