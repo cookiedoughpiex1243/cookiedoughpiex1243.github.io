@@ -188,6 +188,14 @@ document.addEventListener('visibilitychange', () => {
     hasFocus = true;}
 });
 
-
+cwrapper.addEventListener('mousedown', (event) => {
+    if (event.button == 2){
+    event.preventDefault();
+    const selected = event.target.closest(".messageBox");
+    const ID = selected.getAttribute("data-id");
+    messageInput.value = `Selected message with ID ${ID}`;
+    sendMessage();
+    }
+});
 
 loadHistory();
