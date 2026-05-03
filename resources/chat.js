@@ -188,7 +188,7 @@ document.addEventListener('visibilitychange', () => {
     hasFocus = true;}
 });
 
-cwrapper.addEventListener('mousedown', (event) => {
+wrapper.addEventListener('mousedown', (event) => {
     if (event.button == 2){
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
