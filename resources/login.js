@@ -18,14 +18,14 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   const pass = document.getElementById('password');
   const correctHash = uservalue === "josh" ? "16405e094d8fdfc89494dcaff572a3a5e119bd6696f8d7ed2082df87a0339ff8" : "61f40cae069b5dd76e75f78c68941defc0645af7039228c434f2fb10add6bb32";
   const inputHash = await hashPassword(pass.value);
-  if ((uservalue === "josh" || uservalue === "emma") && inputHash === correctHash) {
+  if ((uservalue === "josh" || uservalue === window.user2Name.toLowerCase()) && inputHash === correctHash) {
     message.style.color= "#39ff14";
     message.innerText = " Access Granted, redirecting..";
     sessionStorage.setItem('user', uservalue);
     if (remember.checked) {
-       localStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
+       localStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : window.user2Name.toLowerCase());
     } else {
-       sessionStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : "emma");
+       sessionStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : window.user2Name.toLowerCase());
     }
     if (uservalue === "josh") {
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {

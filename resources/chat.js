@@ -114,7 +114,8 @@ async function sendMessage() {
         text: processedMessage,
         timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         sender: user,
-        room: chatType
+        room: chatType,
+        id: Date.now()
     };
 
     try {
@@ -139,16 +140,17 @@ function renderMessage(msg) {
 
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
+    messageElement.addAttribute('msg-id', msg.id || Date.now());
     
     if (isMe) {
         messageElement.style.marginLeft = "auto";
     }
 
-    // Color Logic: Josh is Blue (#00ffff), Others are Pink (#ea00ff)
+
     const themeColor = isJosh ? "#00ffff" : "#ea00ff";
     messageElement.style.border = `2px solid ${themeColor}`;
 
-    const displayName = isJosh ? "Josh" : (senderLower === "emma" ? "Emma" : "Anonymous");
+    const displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
 
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>

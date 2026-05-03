@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
+<script src="resources/globalScript.js"></script> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pinterest...</title>
@@ -8,9 +9,9 @@
     <script src="resources/chat.js" defer></script>
     <script src="resources/loggedin.js" defer></script>
     <script>
-        sessionStorage.setItem("user", "emma");
+        sessionStorage.setItem("user", window.user2Name.toLowerCase());
         sessionStorage.setItem("site", "echat");
-        sessionStorage.setItem("locked", "emma");
+        sessionStorage.setItem("locked", window.user2Name.toLowerCase());
     </script>
     <link rel="stylesheet" href="resources/style.css">
     <link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIKj0jHE8aYwpvb-CsP4R8OxHYlyGC9OpBAw&s">

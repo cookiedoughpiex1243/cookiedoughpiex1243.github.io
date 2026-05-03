@@ -1,0 +1,1 @@
+window.user2Name = "Emma";

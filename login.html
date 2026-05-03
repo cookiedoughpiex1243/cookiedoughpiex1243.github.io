@@ -1,12 +1,13 @@
 <!DOCTYPE html!>
 <html lang="en">
-<head> 
+<head>
+<script src="resources/globalScript.js"></script> 
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="resources/login.js" defer></script>
   <script>
     const user = sessionStorage.getItem('loggedIn') || localStorage.getItem('loggedIn');
 
-if (user === "josh" || user === "emma") {
+if (user === "josh" || user === window.user2Name.toLowerCase()) {
     const target = (user === "josh") ? "loggedin" : "echat";
     window.location.replace(target);
 }
