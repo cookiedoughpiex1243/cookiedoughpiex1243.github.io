@@ -140,7 +140,7 @@ function renderMessage(msg) {
 
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
-    messageElement.addAttribute('msg-id', msg.id || Date.now());
+    messageElement.setAttribute('msg-id', msg.id || Date.now());
     
     if (isMe) {
         messageElement.style.marginLeft = "auto";
