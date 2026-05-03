@@ -192,7 +192,7 @@ wrapper.addEventListener('mousedown', (event) => {
     if (event.button == 2){
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
-    const ID = selected.getAttribute("data-id");
+    const ID = selected.getAttribute("msg-id");
     messageInput.value = `Selected message with ID ${ID}`;
     sendMessage();
     }
