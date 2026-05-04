@@ -37,7 +37,13 @@ socket.on('receive_message', (msg) => {
     }
 });
 
-// Listen for chat clearing
+socket.on("message_deleted", (id) => {
+    const msgElement = wrapper.querySelector(`.messageBox[msg-id='${id}']`);
+    if (msgElement) {
+        wrapper.removeChild(msgElement);
+    }
+});
+
 socket.on('chat_cleared', () => {
     wrapper.innerHTML = '<div class="messageBox" style="border:2px solid red"><h4 style="color:red">System</h4>Messages Deleted<h6>Recently</h6></div>';
 });
@@ -186,7 +192,8 @@ wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
     const ID = selected.getAttribute("msg-id");
-    messageInput.value = `Selected message with ID ${ID}`;
+    socket.emit("delete_message", {room: chatType, id: ID});
+    messageInput.value = `Deleted message with ID ${ID}`;
     sendMessage();
     
 });
