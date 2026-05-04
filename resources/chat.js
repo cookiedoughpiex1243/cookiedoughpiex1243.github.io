@@ -93,21 +93,16 @@ async function sendMessage() {
         messageInput.value = ''; // Corrected
         return;
      }
-    //Emoji Replacement Logic :D
-    let processedMessage = message
-    .replaceAll(":+1:", "👍") // Corrected emoji replacement
-    .replaceAll(":thumbsup:", "👍")
-    .replaceAll(":grin:", "😄")
-    .replaceAll(":sad:", "😢")
-    .replaceAll(":heart:", "❤️")
-    .replaceAll(":rofl:", "🤣")
-    .replaceAll(":wink:", "😉")
-    .replaceAll(":sob:", "😭")
-    .replaceAll(":angry:", "😠")
-    .replaceAll(":surprised:", "😮")
-    .replaceAll(":cool:", "😎")
-    .replaceAll(":sweat:", "😅")
-    .replaceAll(":pensive:", "😔");
+
+    const emojiMap = {
+        ":+1:": "👍", ":thumbsup:": "👍", ":grin:": "😄",
+        ":sad:": "😢", ":heart:": "❤️", ":rofl:": "🤣",
+        ":wink:": "😉", ":sob:": "😭", ":angry:": "😠",
+        ":surprised:": "😮", ":cool:": "😎", ":sweat:": "😅",
+        ":pensive:": "😔"
+    };
+
+    let processedMessage = message.replace(/:[a-z0-9+]+:/gi, (match) => emojiMap[match] || match);
 
     const msgData = {
         text: processedMessage,
@@ -187,14 +182,13 @@ document.addEventListener('visibilitychange', () => {
     hasFocus = true;}
 });
 
-wrapper.addEventListener('mousedown', (event) => {
-    if (event.button == 2){
+wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
     const ID = selected.getAttribute("msg-id");
     messageInput.value = `Selected message with ID ${ID}`;
     sendMessage();
-    }
+    
 });
 
 loadHistory();
