@@ -133,7 +133,7 @@ sendbtn.addEventListener('click', sendMessage);
 
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
-    const msgRid = document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector('.messageText')?.textContent || null;
+    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector('.messageText')?.textContent || null) : null;
 
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
