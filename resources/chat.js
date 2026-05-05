@@ -1,6 +1,7 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const socket = io(CLOUD_URL);
 
+let clicked = false;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
@@ -124,7 +125,7 @@ async function sendMessage() {
     try {
         socket.emit('send_message', msgData);
         messageInput.value = '';
-        replyIndicator.style.display = "flex" ? replyIndicator.style.display = "none" : null;
+        if (Rid != null) replyIndicator.style.display = "flex" ? replyIndicator.style.display = "none" : null;
         Rid = null;
     } catch (err) {
         console.error("Error sending message:", err);
@@ -205,6 +206,7 @@ wrapper.addEventListener('contextmenu', (event) => {
     
 });
 wrapper.addEventListener('click', (event) => {
+    clicked = clicked ? clicked : true;
     event.preventDefault();
     messageInput.focus();
     messageInput.style.placeholder = `Replying to another message :D`;
