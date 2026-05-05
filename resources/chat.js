@@ -167,7 +167,6 @@ function renderMessage(msg) {
     wrapper.scrollTop = wrapper.scrollHeight;
 }
 
-// Initial load of history via REST (one-time)
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
