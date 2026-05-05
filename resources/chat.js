@@ -5,6 +5,7 @@ const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
 const typeIndicator = document.getElementById("typing-indicator");
+let Rid = null;
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
@@ -115,12 +116,14 @@ async function sendMessage() {
         timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         sender: user,
         room: chatType,
-        id: Date.now()
+        id: Date.now(),
+        Rid: Rid
     };
 
     try {
         socket.emit('send_message', msgData);
         messageInput.value = '';
+        Rid = null;
     } catch (err) {
         console.error("Error sending message:", err);
     }
@@ -130,11 +133,11 @@ sendbtn.addEventListener('click', sendMessage);
 
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
+    const msgRid = document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector('.messageText')?.textContent || null;
 
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     
-    // Determine alignment: "Me" is always on the right
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
 
@@ -154,6 +157,7 @@ function renderMessage(msg) {
 
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
+        ${msgRid ? `<h6 style="color: ${themeColor}"><i>Reply: ${msgRid}</i></h6>` : ""}
         <p class="messageText"></p>
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
@@ -197,6 +201,12 @@ wrapper.addEventListener('contextmenu', (event) => {
     //messageInput.value = `Deleted message with ID ${ID}`;
     //sendMessage();
     
+});
+wrapper.addEventListener('click', (event) => {
+    event.preventDefault();
+    const selected = event.target.closest(".messageBox");
+    if (!selected) return;
+    Rid = selected.getAttribute("msg-id");
 });
 
 loadHistory();
