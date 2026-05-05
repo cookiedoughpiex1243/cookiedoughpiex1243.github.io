@@ -1,4 +1,19 @@
- #typing-indicator {
+ #reply-indicator {
+  height: 20px;
+  padding-right: 20px;
+  font-size: 0.85rem;
+  color: #00ffff;
+  font-style: italic;
+  background-color: transparent;
+  display: none;
+  align-items: center;
+  z-index: 10;
+  bottom: 4.8em;
+  position: absolute;
+  align-self: flex-end;
+}
+
+#typing-indicator {
   height: 20px;
   padding-left: 20px;
   font-size: 0.85rem;

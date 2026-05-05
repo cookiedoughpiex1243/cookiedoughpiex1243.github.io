@@ -5,6 +5,7 @@ const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
 const typeIndicator = document.getElementById("typing-indicator");
+const replyIndicator = document.getElementById("replying-indicator");
 let Rid = null;
 
 const site = sessionStorage.getItem("site") || "unknown";
@@ -123,6 +124,7 @@ async function sendMessage() {
     try {
         socket.emit('send_message', msgData);
         messageInput.value = '';
+        replyIndicator.style.display = "flex" ? replyIndicator.style.display = "none" : null;
         Rid = null;
     } catch (err) {
         console.error("Error sending message:", err);
@@ -209,6 +211,7 @@ wrapper.addEventListener('click', (event) => {
     const selected = event.target.closest(".messageBox");
     if (!selected) return;
     Rid = selected.getAttribute("msg-id");
+    replyIndicator.style.display = "flex";
 });
 
 loadHistory();
