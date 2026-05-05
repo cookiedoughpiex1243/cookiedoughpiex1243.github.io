@@ -157,7 +157,7 @@ function renderMessage(msg) {
 
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
-        ${msgRid ? `<h6 style="color: ${themeColor}"><i>Reply: ${msgRid}</i></h6>` : ""}
+        ${msgRid !== "no rid??!?!?" ? `<h6 style="color: ${themeColor}"><i>Reply: ${msgRid}</i></h6>` : ""}
         <p class="messageText"></p>
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
