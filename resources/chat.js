@@ -151,13 +151,14 @@ function renderMessage(msg) {
 
 
     const themeColor = isJosh ? "#00ffff" : "#ea00ff";
+    const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     messageElement.style.border = `2px solid ${themeColor}`;
 
     const displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
 
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
-        ${msgRid !== null ? (`<h6 style="color: ${themeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
+        ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
         <p class="messageText"></p>
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
