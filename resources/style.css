@@ -96,7 +96,7 @@
  .inputbox {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     width: 100%;
     min-height: 4em;
     background: #0b0c10;
@@ -137,7 +137,7 @@
   }
 
  .chatsite .login-input  {
-width: 100%;
+flex: 1;
 box-sizing: border-box;
 margin-bottom: 0px;
  }
