@@ -50,7 +50,7 @@ socket.on('chat_cleared', () => {
 
 let typingTimeout;
 messageInput.addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
         
         event.preventDefault();
         sendMessage();
@@ -191,10 +191,11 @@ document.addEventListener('visibilitychange', () => {
 wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
+    if (!selected) return;
     const ID = selected.getAttribute("msg-id");
     socket.emit("delete_message", {room: chatType, id: ID});
-    messageInput.value = `Deleted message with ID ${ID}`;
-    sendMessage();
+    //messageInput.value = `Deleted message with ID ${ID}`;
+    //sendMessage();
     
 });
 
