@@ -205,6 +205,8 @@ wrapper.addEventListener('contextmenu', (event) => {
 });
 wrapper.addEventListener('click', (event) => {
     event.preventDefault();
+    messageInput.focus();
+    messageInput.style.placeholder = `Replying to another message :D`;
     const selected = event.target.closest(".messageBox");
     if (!selected) return;
     Rid = selected.getAttribute("msg-id");
