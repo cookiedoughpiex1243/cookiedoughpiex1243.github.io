@@ -37,13 +37,13 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     else {
     setTimeout (() => {
     window.location.href = sessionStorage.getItem("site");
-    message.innerText = ""}, 750);
+    message.innerText = ""}, 500);
     }
   }
   else {
     setTimeout (() => {
     window.location.href = "echat";
-    message.innerText = ""}, 750);
+    message.innerText = ""}, 250);
   }
 }
   else {

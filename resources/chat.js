@@ -84,14 +84,17 @@ socket.on("hide_typing", () => {
 
 async function sendMessage() {
     const message = messageInput.value.trim();
-    if (message === '') return;
+    if (message === '') {
+        Rid = null;
+        replyIndicator.style.display = "none";
+        return;}
     socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
     if (message === "/logout") {
     setTimeout(() => {isTyping = false;}, 100);
         sessionStorage.removeItem('loggedIn');
         sessionStorage.setItem('site', 'login');
         window.location.replace("login");
-        messageInput.value = ''; // Corrected
+        messageInput.value = ''; 
         return;
     }
     
