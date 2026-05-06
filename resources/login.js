@@ -31,13 +31,13 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
     setTimeout (() => {
       window.location.href = "loggedin";
-      message.innerText = ""}, 750);
+      message.innerText = ""}, 500);
     }
     
     else {
     setTimeout (() => {
     window.location.href = sessionStorage.getItem("site");
-    message.innerText = ""}, 500);
+    message.innerText = ""}, 250);
     }
   }
   else {
