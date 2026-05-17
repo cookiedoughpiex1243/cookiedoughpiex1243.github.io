@@ -16,7 +16,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   const user = document.getElementById('username');
   const uservalue = user.value.toLowerCase();
   const pass = document.getElementById('password');
-  const correctHash = uservalue === "61f40cae069b5dd76e75f78c68941defc0645af7039228c434f2fb10add6bb32";
+  const correctHash =  "61f40cae069b5dd76e75f78c68941defc0645af7039228c434f2fb10add6bb32";
   const inputHash = await hashPassword(pass.value);
   if ((uservalue === "josh" || uservalue === window.user2Name.toLowerCase()) && inputHash === correctHash) {
     message.style.color= "#39ff14";
