@@ -2,6 +2,7 @@ const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const socket = io(CLOUD_URL);
 
 let clicked = false;
+let lastSentDate;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
@@ -140,16 +141,27 @@ sendbtn.addEventListener('click', sendMessage);
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
     const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector('.messageText').textContent || null) : null;
-
+    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
 
+    if (sentDate != lastSentDate) {
+       const dIndicator = document.createElement('div');
+       dIndicator.classList.add('dIndicator');
+       dIndicator.innerHTML = `
+       <p><b>${sentDate}</b></p>
+       `;
+       wrapper.appendChild(dIndicator);
+       console.log(sentDate);
+    }
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
     messageElement.setAttribute('msg-id', msg.id || Date.now());
+
+
     
     if (isMe) {
         messageElement.style.marginLeft = "auto";
@@ -171,6 +183,7 @@ function renderMessage(msg) {
     messageElement.querySelector('.messageText').textContent = msg.text || "";
     wrapper.appendChild(messageElement);
     wrapper.scrollTop = wrapper.scrollHeight;
+    lastSentDate = sentDate;
 }
 
 async function loadHistory() {

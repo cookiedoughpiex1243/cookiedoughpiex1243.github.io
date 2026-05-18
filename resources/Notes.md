@@ -1,7 +1,14 @@
 - To-Do
-Add date indicators (Bar upon new message on a new day)
+Better UI :/
 
 
+
+- Day  marker
+Calc using existing Msg IDs (Derive date from the milis())
+let lastMsgDate
+if messageSendDate != lastMsgDate {
+    do something.
+} 
 
 
 - Reply logic

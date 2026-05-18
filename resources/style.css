@@ -1,4 +1,13 @@
- #replying-indicator, #typing-indicator {
+.dIndicator {
+  text-align: center;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  color:#00ffff;
+}
+
+
+#replying-indicator, #typing-indicator {
   height: 20px;
   font-size: 0.85rem;
   color: #00ffff;
