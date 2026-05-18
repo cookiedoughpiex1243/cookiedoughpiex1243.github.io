@@ -3,6 +3,7 @@ const socket = io(CLOUD_URL);
 
 let clicked = false;
 let lastSentDate;
+const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
 const sendbtn = document.getElementById('sendbtn');
@@ -19,6 +20,7 @@ const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
 setTimeout(() => {
     document.body.style.display = "flex";
+    console.log("Touchscreen: "+isMobile);
 }, 500);
 
 // Join the appropriate room on connection
