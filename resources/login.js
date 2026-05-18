@@ -20,7 +20,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
   const inputHash = await hashPassword(pass.value);
   if ((uservalue === "josh" || uservalue === window.user2Name.toLowerCase()) && inputHash === correctHash) {
     message.style.color= "#39ff14";
-    message.innerText = " Access Granted, redirecting..";
+    message.innerText = uservalue === "josh" ? " Access Granted, redirecting.." : `Hey ${uservalue.substring(0, 1).toUpperCase+uservalue.substring(1)} :D`;
     sessionStorage.setItem('user', uservalue);
     if (remember.checked) {
        localStorage.setItem('loggedIn', uservalue ==='josh' ? "josh" : window.user2Name.toLowerCase());
