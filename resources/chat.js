@@ -3,6 +3,8 @@ const socket = io(CLOUD_URL);
 
 let clicked = false;
 let lastSentDate;
+let lastReplied = null;
+let lastRepliedID = null;
 const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
@@ -20,9 +22,14 @@ const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
 function selectReply() {
     messageInput.focus();
+	if(lastReplied != null) {
+		lastReplied.style.border = `2px solid ${user == "josh" ? "#0000ff" : "#ea00ff"}`;
+	}
     const selected = event.target.closest(".messageBox");
-    if (!selected) return;
+    lastReplied = selected;
+	if (!selected) return;
     Rid = selected.getAttribute("msg-id");
+    selected.style.border = "2px solid red";
     replyIndicator.style.display = "flex";
 }
 
@@ -31,7 +38,7 @@ setTimeout(() => {
     console.log("Touchscreen: "+isMobile);
 }, 500);
 
-// Join the appropriate room on connection
+//Join socket room(idk) on connecting
 socket.emit('join_room', chatType);
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;

@@ -1,5 +1,18 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
 - To-Do
-Change tap-to-reply to swipe-to-reply on touch devices.
+Add indicator for selected reply message
 Better UI :/
 
 
@@ -10,7 +23,6 @@ let lastMsgDate
 if messageSendDate != lastMsgDate {
     do something.
 } 
-
 
 - Reply logic
 
