@@ -18,6 +18,14 @@ const user = sessionStorage.getItem("user") || "anonymous";
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
 
+function selectReply() {
+    messageInput.focus();
+    const selected = event.target.closest(".messageBox");
+    if (!selected) return;
+    Rid = selected.getAttribute("msg-id");
+    replyIndicator.style.display = "flex";
+}
+
 setTimeout(() => {
     document.body.style.display = "flex";
     console.log("Touchscreen: "+isMobile);
@@ -223,15 +231,30 @@ wrapper.addEventListener('contextmenu', (event) => {
     //sendMessage();
     
 });
-wrapper.addEventListener('click', (event) => {
-    clicked = clicked ? clicked : true;
-    event.preventDefault();
-    messageInput.focus();
-    messageInput.style.placeholder = `Replying to another message :D`;
-    const selected = event.target.closest(".messageBox");
-    if (!selected) return;
-    Rid = selected.getAttribute("msg-id");
-    replyIndicator.style.display = "flex";
-});
+if (isMobile == false) {
+    wrapper.addEventListener('click', (event) => {
+        clicked = clicked ? clicked : true;
+        event.preventDefault();
+        selectReply();
+    });
+}
 
+let initialX = null;
+let initialY = null;
+let finalX = null;
+let finalY = null;
+wrapper.addEventListener("touchstart", function(e) {
+    initialX = e.touches[0].clientX;
+    initialY = e.touches[0].clientY;
+}, false)
+
+wrapper.addEventListener("touchend", function(e) {
+    finalX = e.changedTouches[0].clientX;
+    finalY = e.changedTouches[0].clientY;
+    if((finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
+        console.log(initialY);
+        console.log(finalY);
+        selectReply();
+    }
+})
 loadHistory();

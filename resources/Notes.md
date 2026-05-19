@@ -1,5 +1,5 @@
 - To-Do
-Possibly change tap-to-reply to swipe-to-reply on touch devices.
+Change tap-to-reply to swipe-to-reply on touch devices.
 Better UI :/
 
 
