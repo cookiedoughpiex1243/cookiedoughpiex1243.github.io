@@ -33,8 +33,9 @@ function sendSystemMessage(msg) {
 }
 
 function cancelReply() {
-    const lastReplySenderColor = document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector("h4").style.color;
-	if(lastReplied != null) {
+    if(lastReplied != null) {
+    const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
+	
 		Rid = null;
 		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
 	}	
