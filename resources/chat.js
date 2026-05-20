@@ -136,9 +136,9 @@ async function sendMessage() {
             return;
             break;
         case '/help':
-            const msg = `Hello :D, here's some information:
-			/logout to logout (or just redirect to login page
-			/help for this message :D)`
+const msg = `Hello :D, here's some information:
+/logout to logout (or just redirect to login page
+/help for this message :D)`
             sendSystemMessage(msg)
             messageInput.value = '';
             break;
@@ -222,6 +222,7 @@ function renderMessage(msg) {
     if(isSystem) {
         messageElement.style.marginLeft = "auto";
         messageElement.style.marginRight = "auto";
+		messageElement.style.alignItems = "center";
         themeColor = "red"
         displayName = "System"
     }    
