@@ -35,7 +35,7 @@ function sendSystemMessage(msg) {
 function cancelReply() {
 	if(lastReplied != null) {
 		Rid = null;
-		lastReplied.style.border = `2px solid ${user == "josh" ? "#0000ff" : "#ea00ff"}`;
+		lastReplied.style.border = `2px solid ${user == "josh" ? "#00ffff" : "#ea00ff"}`;
 	}	
 }
 
@@ -214,14 +214,15 @@ function renderMessage(msg) {
 
     let themeColor = isJosh ? "#00ffff" : "#ff00ff";
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
-    messageElement.style.border = `2px solid ${themeColor}`;
     
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
         messageElement.style.transform = "translateX(50%)";
         themeColor = "red"
         displayName = "System"
-    }
+    }    
+    messageElement.style.border = `2px solid ${themeColor}`;
+
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
