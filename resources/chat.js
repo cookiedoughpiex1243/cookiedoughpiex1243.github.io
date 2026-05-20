@@ -33,9 +33,10 @@ function sendSystemMessage(msg) {
 }
 
 function cancelReply() {
+    const lastReplySenderColor = document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector("h4").style.color;
 	if(lastReplied != null) {
 		Rid = null;
-		lastReplied.style.border = `2px solid ${user == "josh" ? "#00ffff" : "#ea00ff"}`;
+		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
 	}	
 }
 
@@ -217,7 +218,8 @@ function renderMessage(msg) {
     
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
-        messageElement.style.transform = "translateX(50%)";
+        messageElement.style.marginLeft = "auto";
+        messageElement.style.marginRight = "auto";
         themeColor = "red"
         displayName = "System"
     }    
