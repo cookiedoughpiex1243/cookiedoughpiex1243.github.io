@@ -136,7 +136,9 @@ async function sendMessage() {
             return;
             break;
         case '/help':
-            const msg = "Hello :D (no help for u yet :)"
+            const msg = `Hello :D, here's some information:
+			/logout to logout (or just redirect to login page
+			/help for this message :D)`
             sendSystemMessage(msg)
             messageInput.value = '';
             break;
