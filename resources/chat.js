@@ -5,6 +5,7 @@ let clicked = false;
 let lastSentDate;
 let lastReplied = null;
 let lastRepliedID = null;
+let msgCount = null;
 const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
@@ -19,12 +20,16 @@ const user = sessionStorage.getItem("user") || "anonymous";
 
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
+function cancelReply() {
+	if(lastReplied != null) {
+		Rid = null;
+		lastReplied.style.border = `2px solid ${user == "josh" ? "#0000ff" : "#ea00ff"}`;
+	}	
+}
 
 function selectReply() {
     messageInput.focus();
-	if(lastReplied != null) {
-		lastReplied.style.border = `2px solid ${user == "josh" ? "#0000ff" : "#ea00ff"}`;
-	}
+	cancelReply();
     const selected = event.target.closest(".messageBox");
     lastReplied = selected;
 	if (!selected) return;
@@ -103,7 +108,7 @@ socket.on("hide_typing", () => {
 async function sendMessage() {
     const message = messageInput.value.trim();
     if (message === '') {
-        Rid = null;
+		cancelReply()
         replyIndicator.style.display = "none";
         return;}
     socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
@@ -210,6 +215,7 @@ async function loadHistory() {
         const messages = await res.json();
         wrapper.innerHTML = ''; 
         messages.forEach(renderMessage);
+        msgCount = messages.length;
     } catch (err) {
         console.error("Failed to load history:", err);
     }
@@ -259,9 +265,12 @@ wrapper.addEventListener("touchend", function(e) {
     finalX = e.changedTouches[0].clientX;
     finalY = e.changedTouches[0].clientY;
     if((finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
-        console.log(initialY);
-        console.log(finalY);
         selectReply();
     }
 })
 loadHistory();
+document.addEventListener("DOMContentLoaded", () => {
+setTimeout(() => {
+    console.log("Total messages: " + msgCount);
+    
+}, 250);})

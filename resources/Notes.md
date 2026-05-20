@@ -12,7 +12,7 @@
 
 
 - To-Do
-Add indicator for selected reply message
+Sliding message on swipe
 Better UI :/
 
 
