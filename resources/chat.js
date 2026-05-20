@@ -216,7 +216,7 @@ function renderMessage(msg) {
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     messageElement.style.border = `2px solid ${themeColor}`;
     
-    const displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
+    let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
         messageElement.style.transform = "translateX(50%)";
         themeColor = "red"
