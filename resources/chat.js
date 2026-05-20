@@ -201,7 +201,6 @@ function renderMessage(msg) {
        <p><b>${sentDate}</b></p>
        `;
        wrapper.appendChild(dIndicator);
-       console.log(sentDate);
     }
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
