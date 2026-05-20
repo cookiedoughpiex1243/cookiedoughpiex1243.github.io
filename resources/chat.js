@@ -170,7 +170,7 @@ async function sendMessage() {
         socket.emit('send_message', msgData);
         messageInput.value = '';
         if (Rid != null) replyIndicator.style.display = "flex" ? replyIndicator.style.display = "none" : null;
-        Rid = null;
+        cancelReply();
     } catch (err) {
         console.error("Error sending message:", err);
     }
@@ -212,7 +212,7 @@ function renderMessage(msg) {
     }
 
 
-    const themeColor = isJosh ? "#00ffff" : "#ff00ff";
+    let themeColor = isJosh ? "#00ffff" : "#ff00ff";
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     messageElement.style.border = `2px solid ${themeColor}`;
     
