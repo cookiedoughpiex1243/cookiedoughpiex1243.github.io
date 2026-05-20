@@ -20,6 +20,18 @@ const user = sessionStorage.getItem("user") || "anonymous";
 
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
+function sendSystemMessage(msg) {
+    const msgData = {
+        text: msg,
+        timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        sender: "System",
+        room: chatType,
+        id: Date.now(),
+        Rid: Rid
+    };
+    socket.emit("send_message", msgData);
+}
+
 function cancelReply() {
 	if(lastReplied != null) {
 		Rid = null;
@@ -110,24 +122,30 @@ async function sendMessage() {
     if (message === '') {
 		cancelReply()
         replyIndicator.style.display = "none";
+        socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
         return;}
-    socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
-    if (message === "/logout") {
-    setTimeout(() => {isTyping = false;}, 100);
-        sessionStorage.removeItem('loggedIn');
-        sessionStorage.setItem('site', 'login');
-        window.location.replace("login");
-        messageInput.value = ''; 
-        return;
-    }
-    
-    
-    if (message === "/clearAll") {
+    switch(message) {
+        case '/logout':
+            setTimeout(() => {isTyping = false;}, 100);
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.setItem('site', 'login');
+            window.location.replace("login");
+            messageInput.value = ''; 
+            return;
+            break;
+        case '/help':
+            const msg = "Hello :D (no help for u yet :)"
+            sendSystemMessage(msg)
+            messageInput.value = '';
+            break;
+        case '/clearall':
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
-        messageInput.value = ''; // Corrected
+        messageInput.value = '';
         return;
-     }
+        default:
+    
+    
 
     const emojiMap = {
         ":+1:": "👍", ":thumbsup:": "👍", ":grin:": "😄",
@@ -156,7 +174,10 @@ async function sendMessage() {
     } catch (err) {
         console.error("Error sending message:", err);
     }
+    break;
+    }
 }
+
 
 sendbtn.addEventListener('click', sendMessage);
 
@@ -169,6 +190,7 @@ function renderMessage(msg) {
     
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
+    const isSystem = (senderLower === "system");
 
     if (sentDate != lastSentDate) {
        const dIndicator = document.createElement('div');
@@ -193,9 +215,13 @@ function renderMessage(msg) {
     const themeColor = isJosh ? "#00ffff" : "#ff00ff";
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     messageElement.style.border = `2px solid ${themeColor}`;
-
+    
     const displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
-
+    if(isSystem) {
+        messageElement.style.transform = "translateX(50%)";
+        themeColor = "red"
+        displayName = "System"
+    }
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
