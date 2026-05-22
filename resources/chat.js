@@ -38,6 +38,7 @@ function cancelReply() {
 	
 		Rid = null;
 		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
+		lastReplied.style.scale = "1";
 	}	
 }
 
@@ -283,7 +284,8 @@ if (isMobile == false) {
         selectReply();
     });
 }
-
+//swipey logic
+let swipedBox;
 let initialX = null;
 let initialY = null;
 let finalX = null;
@@ -291,6 +293,8 @@ let finalY = null;
 wrapper.addEventListener("touchstart", function(e) {
     initialX = e.touches[0].clientX;
     initialY = e.touches[0].clientY;
+	swipedBox = e.target.closest(".messageBox");
+	swipedBox.style.scale = "1.05";
 }, false)
 
 wrapper.addEventListener("touchend", function(e) {
@@ -299,6 +303,7 @@ wrapper.addEventListener("touchend", function(e) {
     if((finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
         selectReply();
     }
+	swipedBox.style.scale = "1";
 })
 loadHistory();
 document.addEventListener("DOMContentLoaded", () => {
