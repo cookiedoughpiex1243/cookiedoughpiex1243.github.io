@@ -310,4 +310,4 @@ document.addEventListener("DOMContentLoaded", () => {
 setTimeout(() => {
     console.log("Total messages: " + msgCount);
     
-}, 500);})
+}, 2000);})

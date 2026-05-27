@@ -12,9 +12,18 @@
 
 
 - To-Do
-Sliding message on swipe
+Connect to esp32
 Better UI :/
 
+---------------------------
+ GET SOLE USER BACK.     |
+---------------------------
+
+- ESP32 Connection logic - refined
+Frontend: send hasFocus along with message data
+Backend - Sender != josh && !hasFocus ? writetoFile Newmsgcounter
+ESP32 - Websockets onrender.com/newmsgcounter---Buzzer+LCD
+Backend - hasFocus ? clear newmsgcounter + Websockets to ESP32
 
 
 - Day  marker
