@@ -169,6 +169,7 @@ const msg = `Hello :D, here's some information:\n
         room: chatType,
         id: Date.now(),
         Rid: Rid
+        
     };
 
     try {
@@ -259,9 +260,11 @@ let hasFocus = document.hasFocus();
 document.addEventListener('visibilitychange', () => {
     if(document.hidden){
     hasFocus = false
-    console.log("unfocused");}
+    console.log("unfocused");
+    socket.emit("unfocused", {room:chatType, user: user})}
     else{
     console.log("focused")
+    socket.emit("focused", {room:chatType, user: user})
     document.title = defaultTitle;
     newMsgs = 0;
     hasFocus = true;}
@@ -307,6 +310,7 @@ wrapper.addEventListener("touchend", function(e) {
 })
 loadHistory();
 document.addEventListener("DOMContentLoaded", () => {
+    socket.emit("focused", {room:chatType, user:user});
 setTimeout(() => {
     console.log("Total messages: " + msgCount);
     

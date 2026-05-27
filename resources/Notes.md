@@ -20,7 +20,7 @@ Better UI :/
 ---------------------------
 
 - ESP32 Connection logic - refined
-Frontend: send hasFocus along with message data
+Frontend: send hasFocus along visibility change
 Backend - Sender != josh && !hasFocus ? writetoFile Newmsgcounter
 ESP32 - Websockets onrender.com/newmsgcounter---Buzzer+LCD
 Backend - hasFocus ? clear newmsgcounter + Websockets to ESP32
