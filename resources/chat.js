@@ -189,8 +189,7 @@ sendbtn.addEventListener('click', sendMessage);
 
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
-    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`).querySelector('.messageText').textContent || null) : null;
-    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
+    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     
