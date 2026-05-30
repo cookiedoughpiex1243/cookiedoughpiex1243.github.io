@@ -150,7 +150,7 @@ const msg = `Hello :D, here's some information:\n
         }
 		else {
 			sendSystemMessage("Lol no. Only josh gets to do that :)");
-			console.log(`${user} tried clearing chat...tsk tsk`;
+			console.log(`${user} tried clearing chat...tsk tsk`);
 			}
 			messageInput.value = '';
         return;
