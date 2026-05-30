@@ -144,9 +144,10 @@ const msg = `Hello :D, here's some information:\n
             messageInput.value = '';
             break;
         case '/clearall':
+		if(user === "josh"){
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
-        messageInput.value = '';
+        messageInput.value = '';}
         return;
         default:
     
