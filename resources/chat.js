@@ -147,9 +147,12 @@ const msg = `Hello :D, here's some information:\n
 		if(user === "josh"){
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
-        messageInput.value = '';}
+        }
 		else {
-			sendSystemMsg("Lol no. Only josh gets to do that :)");}
+			sendSystemMessage("Lol no. Only josh gets to do that :)");
+			console.log(`${user} tried clearing chat...tsk tsk`;
+			}
+			messageInput.value = '';
         return;
         default:
     
