@@ -148,6 +148,8 @@ const msg = `Hello :D, here's some information:\n
         socket.emit("clear_chat", chatType);
         console.log("chat cleared");
         messageInput.value = '';}
+		else {
+			sendSystemMsg("Lol no. Only josh gets to do that :)");}
         return;
         default:
     
