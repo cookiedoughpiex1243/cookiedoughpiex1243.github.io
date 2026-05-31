@@ -82,6 +82,7 @@ socket.on("message_deleted", (id) => {
     const msgElement = wrapper.querySelector(`.messageBox[msg-id='${id}']`);
     if (msgElement) {
         wrapper.removeChild(msgElement);
+		console.log("A message was deleted");
     }
 });
 
@@ -198,7 +199,8 @@ function renderMessage(msg) {
     const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
-    
+    const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
+    const shouldAutoscroll = distanceToBottom < 200;
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
     const isSystem = (senderLower === "system");
@@ -243,9 +245,11 @@ function renderMessage(msg) {
     `;
     messageElement.querySelector('.messageText').textContent = msg.text || "";
     wrapper.appendChild(messageElement);
-    wrapper.scrollTop = wrapper.scrollHeight;
-    lastSentDate = sentDate;
-}
+    if (shouldAutoscroll) {
+        wrapper.scrollTop = wrapper.scrollHeight;
+	}
+	lastSentDate = sentDate;
+
 
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";

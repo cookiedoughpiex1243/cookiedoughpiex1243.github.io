@@ -12,11 +12,10 @@
 
 
 - To-Do
-Connect to esp32
 Better UI :/
 
 ---------------------------
- GET SOLE USER BACK.     |
+ KEEP SOLE USER.     |
 ---------------------------
 
 - ESP32 Connection logic - refined
