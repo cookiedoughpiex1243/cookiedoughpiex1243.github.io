@@ -63,7 +63,7 @@ socket.emit('join_room', chatType);
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;
 let newMsgs = 0;
-//Da thing to make sure sound not autoblocked
+//Da thing to make sure sound not autoblocked(USELESS :(  )
 document.addEventListener('click', () => {
     notif.play().then(() => {
         notif.pause();
