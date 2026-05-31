@@ -242,7 +242,7 @@ function renderMessage(msg) {
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
         ${isImage
-            ? `<img class="messageText" src="${msg.text}" style="max-width:260px;max-height:340px;border-radius:8px;margin-top:4px;display:block;object-fit:contain;cursor:zoom-in;transition:transform 0.2s ease;">`
+            ? `<img class="messageText" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
             : `<p class="messageText"></p>`
         }
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
@@ -386,12 +386,14 @@ lightbox.style.cssText = `
 
 const lightboxImg = document.createElement('img');
 lightboxImg.style.cssText = `
-    max-width: 95%;
-    max-height: 95%;
-    object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: auto !important;
+    height: auto !important;
+    max-width: 95% !important;
+    max-height: 95% !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3) !important;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     transform: scale(0.9);
 `;
 
