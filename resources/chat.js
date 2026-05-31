@@ -200,7 +200,7 @@ function renderMessage(msg) {
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
-    const shouldAutoscroll = distanceToBottom < 200;
+    const shouldAutoscroll = distanceToBottom < 400;
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
     const isSystem = (senderLower === "system");
