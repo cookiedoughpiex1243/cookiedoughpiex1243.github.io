@@ -245,7 +245,7 @@ function renderMessage(msg) {
     `;
     messageElement.querySelector('.messageText').textContent = msg.text || "";
     wrapper.appendChild(messageElement);
-    if (shouldAutoscroll) {
+    if (shouldAutoscroll || performance.now() < 3000) {
         wrapper.scrollTop = wrapper.scrollHeight;
 	}
 	lastSentDate = sentDate;
