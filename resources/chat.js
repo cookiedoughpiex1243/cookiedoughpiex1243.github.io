@@ -242,12 +242,21 @@ function renderMessage(msg) {
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
         ${isImage
-            ? `<img class="messageText" src="${msg.text}" style="max-width:260px;max-height:340px;border-radius:8px;margin-top:4px;display:block;object-fit:contain;">`
+            ? `<img class="messageText" src="${msg.text}" style="max-width:260px;max-height:340px;border-radius:8px;margin-top:4px;display:block;object-fit:contain;cursor:zoom-in;transition:transform 0.2s ease;">`
             : `<p class="messageText"></p>`
         }
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
-    if (!isImage) messageElement.querySelector('.messageText').textContent = msg.text || "";
+    if (!isImage) {
+        messageElement.querySelector('.messageText').textContent = msg.text || "";
+    } else {
+        const img = messageElement.querySelector('.messageText');
+        img.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            openLightbox(msg.text);
+        });
+    }
     wrapper.appendChild(messageElement);
     if (shouldAutoscroll || performance.now() < 3000) {
         wrapper.scrollTop = wrapper.scrollHeight;
@@ -353,6 +362,58 @@ messageInput.addEventListener('paste', (event) => {
         }
     }
 });
+
+// --- Image Lightbox Support ---
+const lightbox = document.createElement('div');
+lightbox.id = 'imgLightbox';
+lightbox.style.cssText = `
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(11, 12, 16, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    cursor: zoom-out;
+`;
+
+const lightboxImg = document.createElement('img');
+lightboxImg.style.cssText = `
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: scale(0.9);
+`;
+
+lightbox.appendChild(lightboxImg);
+document.body.appendChild(lightbox);
+
+lightbox.addEventListener('click', () => {
+    lightbox.style.opacity = '0';
+    lightboxImg.style.transform = 'scale(0.9)';
+    setTimeout(() => {
+        lightbox.style.display = 'none';
+    }, 250);
+});
+
+function openLightbox(src) {
+    lightboxImg.src = src;
+    lightbox.style.display = 'flex';
+    // Force reflow
+    lightbox.offsetHeight;
+    lightbox.style.opacity = '1';
+    lightboxImg.style.transform = 'scale(1)';
+}
 
 loadHistory();
 document.addEventListener("DOMContentLoaded", () => {
