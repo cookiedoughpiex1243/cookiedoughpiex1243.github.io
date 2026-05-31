@@ -31,19 +31,25 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     if (sessionStorage.getItem("site") === "login" || sessionStorage.getItem("locked") === "false") {
     setTimeout (() => {
       window.location.href = "loggedin";
-      message.innerText = ""}, 500);
+      document.addEventListener("pagehide", () => {
+      message.innerText = "";
+    })}, 500);
     }
     
     else {
     setTimeout (() => {
     window.location.href = sessionStorage.getItem("site");
-    message.innerText = ""}, 250);
+    document.addEventListener("pagehide", () => {
+      message.innerText = "";
+    })}, 250);
     }
   }
   else {
     setTimeout (() => {
-    window.location.href = "echat";
-    message.innerText = ""}, 250);
+    window.location.href = "echat";}, 250);
+    document.addEventListener("pagehide", () => {
+      message.innerText = "";
+    })
   }
 }
   else {
