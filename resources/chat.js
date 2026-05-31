@@ -249,7 +249,7 @@ function renderMessage(msg) {
         wrapper.scrollTop = wrapper.scrollHeight;
 	}
 	lastSentDate = sentDate;
-
+}
 
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
