@@ -237,13 +237,17 @@ function renderMessage(msg) {
     }    
     messageElement.style.border = `2px solid ${themeColor}`;
 
+    const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
-        <p class="messageText"></p>
+        ${isImage
+            ? `<img class="messageText" src="${msg.text}" style="max-width:260px;max-height:340px;border-radius:8px;margin-top:4px;display:block;object-fit:contain;">`
+            : `<p class="messageText"></p>`
+        }
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
-    messageElement.querySelector('.messageText').textContent = msg.text || "";
+    if (!isImage) messageElement.querySelector('.messageText').textContent = msg.text || "";
     wrapper.appendChild(messageElement);
     if (shouldAutoscroll || performance.now() < 3000) {
         wrapper.scrollTop = wrapper.scrollHeight;
@@ -317,6 +321,39 @@ wrapper.addEventListener("touchend", function(e) {
     }
 	swipedBox.style.scale = "1";
 })
+
+// --- Image paste support ---
+messageInput.addEventListener('paste', (event) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+        if (item.type.startsWith('image/')) {
+            event.preventDefault();
+            const file = item.getAsFile();
+            if (!file) return;
+            if (file.size > 1024 * 1024) {
+                alert('Image too large — keep it under 1 MB.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                socket.emit('send_message', {
+                    room: chatType,
+                    text: reader.result,   // base64 data URL
+                    sender: user,
+                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    id: Date.now(),
+                    Rid: Rid ?? null,
+                });
+                cancelReply();
+                replyIndicator.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+            break;
+        }
+    }
+});
+
 loadHistory();
 document.addEventListener("DOMContentLoaded", () => {
     socket.emit("focused", {room:chatType, user:user});
