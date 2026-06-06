@@ -13,6 +13,7 @@ const sendbtn = document.getElementById('sendbtn');
 const typeIndicator = document.getElementById("typing-indicator");
 const replyIndicator = document.getElementById("replying-indicator");
 let Rid = null;
+let hasFocus = document.hasFocus();
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
@@ -194,6 +195,8 @@ const msg = `Hello :D, here's some information:\n
 
 sendbtn.addEventListener('click', sendMessage);
 
+let isHistoryLoading = false;
+
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
     const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
@@ -232,8 +235,8 @@ function renderMessage(msg) {
         messageElement.style.marginLeft = "auto";
         messageElement.style.marginRight = "auto";
 		messageElement.style.alignItems = "center";
-        themeColor = "red"
-        displayName = "System"
+        themeColor = "red";
+        displayName = "System";
     }    
     messageElement.style.border = `2px solid ${themeColor}`;
 
@@ -256,9 +259,15 @@ function renderMessage(msg) {
             e.preventDefault();
             openLightbox(msg.text);
         });
+        img.addEventListener('load', () => {
+            const currentDistance = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
+            if (currentDistance < 400) {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            }
+        });
     }
     wrapper.appendChild(messageElement);
-    if (shouldAutoscroll || performance.now() < 3000) {
+    if (!isHistoryLoading && shouldAutoscroll) {
         wrapper.scrollTop = wrapper.scrollHeight;
 	}
 	lastSentDate = sentDate;
@@ -266,19 +275,36 @@ function renderMessage(msg) {
 
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
+    isHistoryLoading = true;
     try {
         const res = await fetch(`${CLOUD_URL}/${endpoint}`);
         const messages = await res.json();
         wrapper.innerHTML = ''; 
         messages.forEach(renderMessage);
         msgCount = messages.length;
+        
+        // Scroll to bottom of chat
+        wrapper.scrollTop = wrapper.scrollHeight;
+        
+        // Double-check scrolling after browser layout paints
+        requestAnimationFrame(() => {
+            wrapper.scrollTop = wrapper.scrollHeight;
+        });
+        setTimeout(() => {
+            wrapper.scrollTop = wrapper.scrollHeight;
+        }, 100);
+        setTimeout(() => {
+            wrapper.scrollTop = wrapper.scrollHeight;
+        }, 300);
     } catch (err) {
         console.error("Failed to load history:", err);
+    } finally {
+        isHistoryLoading = false;
     }
 }
 
 
-let hasFocus = document.hasFocus();
+
 document.addEventListener('visibilitychange', () => {
     if(document.hidden){
     hasFocus = false
