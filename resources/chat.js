@@ -3,6 +3,8 @@ const socket = io(CLOUD_URL);
 
 let clicked = false;
 let lastSentDate;
+let lastSentHour;
+let lastSentMinute;
 let lastReplied = null;
 let lastRepliedID = null;
 let msgCount = null;
@@ -199,7 +201,8 @@ let isHistoryLoading = false;
 
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
-    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
+    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;
+	const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
     const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
@@ -240,8 +243,13 @@ function renderMessage(msg) {
         displayName = "System";
     }    
     messageElement.style.border = `2px solid ${themeColor}`;
-
+	const sentHour = parseInt(msg.timestamp.split(":")[0]);
+	const sentMinute = parseInt(msg.timestamp.split(":")[1]);
     const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
+	if (sentHour !== lastSentHour || sentMinute - lastSentMinute > 5) {
+		messageElement.style.marginTop = "5em";
+		}
+
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
@@ -272,6 +280,8 @@ function renderMessage(msg) {
         wrapper.scrollTop = wrapper.scrollHeight;
 	}
 	lastSentDate = sentDate;
+	lastSentHour = sentHour;
+	lastSentMinute = sentMinute;
 }
 
 async function loadHistory() {
