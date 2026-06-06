@@ -229,7 +229,8 @@ function renderMessage(msg) {
 
     let themeColor = isJosh ? "#00ffff" : "#ff00ff";
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
-    
+    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
+
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
         messageElement.style.marginLeft = "auto";
@@ -243,7 +244,7 @@ function renderMessage(msg) {
     const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
-        ${msgRid !== null ? (`<h6 style="color: ${oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
+        ${msgRid !== null ? (`<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
         ${isImage
             ? `<img class="messageText" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
             : `<p class="messageText"></p>`
@@ -414,7 +415,7 @@ const lightboxImg = document.createElement('img');
 lightboxImg.style.cssText = `
     width: auto !important;
     height: auto !important;
-    max-width: 95% !important;
+    /max-width: 95% !important;
     max-height: 95% !important;
     object-fit: contain !important;
     border-radius: 8px !important;
