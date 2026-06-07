@@ -333,11 +333,12 @@ wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
     if (!selected) return;
+	const confirmed = window.confirm(`Are you sure you want to delete message: "${selected.querySelector(".messageText").textContent}"`);
+	if (confirmed === true) {
     const ID = selected.getAttribute("msg-id");
-    socket.emit("delete_message", {room: chatType, id: ID});
-    //messageInput.value = `Deleted message with ID ${ID}`;
-    //sendMessage();
-    
+    	socket.emit("delete_message", {room: chatType, id: ID});
+	}
+       
 });
 if (isMobile == false) {
     wrapper.addEventListener('click', (event) => {
