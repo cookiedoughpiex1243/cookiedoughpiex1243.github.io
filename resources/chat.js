@@ -19,7 +19,7 @@ const sendbtn = document.getElementById('sendbtn');
 const typeIndicator = document.getElementById("typing-indicator");
 const replyIndicator = document.getElementById("replying-indicator");
 let Rid = null;
-let hasFocus = document.hasFocus();
+let hasFocus = true;
 
 const site = sessionStorage.getItem("site") || "unknown";
 const user = sessionStorage.getItem("user") || "anonymous";
