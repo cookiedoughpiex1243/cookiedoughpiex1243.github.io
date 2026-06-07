@@ -42,6 +42,7 @@ function cancelReply() {
 		Rid = null;
 		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
 		lastReplied.style.scale = "1";
+		replyIndicator.style.display = "none";
 	}	
 }
 
@@ -52,6 +53,7 @@ function selectReply() {
     lastReplied = selected;
 	if (!selected) return;
     Rid = selected.getAttribute("msg-id");
+	if (Rid === null) cancelReply;
     selected.style.border = "2px solid red";
     replyIndicator.style.display = "flex";
 }
