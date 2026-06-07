@@ -1,6 +1,8 @@
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const socket = io(CLOUD_URL);
 
+let jlast;
+let elast;
 let clicked = false;
 let lastSentDate;
 let lastSentHour;
@@ -8,6 +10,8 @@ let lastSentMinute;
 let lastReplied = null;
 let lastRepliedID = null;
 let msgCount = null;
+let historyLoaded = false;
+let initialScrollDone = false;
 const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
 const wrapper = document.querySelector('.cwrapper');
@@ -36,26 +40,59 @@ function sendSystemMessage(msg) {
 }
 
 function cancelReply() {
-    if(lastReplied != null) {
-    const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
-	
-		Rid = null;
-		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
-		lastReplied.style.scale = "1";
-		replyIndicator.style.display = "none";
-	}	
+    if (lastReplied != null) {
+        const lastReplySenderColor = lastReplied.querySelector("h4")?.style.color || "#00ffff";
+        lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
+        lastReplied.style.scale = "1";
+    }
+    Rid = null;
+    lastReplied = null;
+    if (replyIndicator) {
+        replyIndicator.style.display = "none";
+    }
 }
 
-function selectReply() {
+function selectReply(element) {
+    if (!element) return;
     messageInput.focus();
-	cancelReply();
-    const selected = event.target.closest(".messageBox");
-    lastReplied = selected;
-	if (!selected) return;
-    Rid = selected.getAttribute("msg-id");
-	if (Rid === null) cancelReply;
-    selected.style.border = "2px solid red";
-    replyIndicator.style.display = "flex";
+    cancelReply();
+    lastReplied = element;
+    Rid = element.getAttribute("msg-id");
+    if (Rid === null) {
+        cancelReply();
+        return;
+    }
+    element.style.border = "2px solid red";
+    if (replyIndicator) {
+        replyIndicator.style.display = "flex";
+    }
+}
+
+function getLastMessageID() {
+    const messageBoxes = wrapper.querySelectorAll('.messageBox');
+    if (messageBoxes.length > 0) {
+        return messageBoxes[messageBoxes.length - 1].getAttribute('msg-id');
+    }
+    return null;
+}
+
+function scrollToUnread() {
+    if (initialScrollDone) return;
+    const lastReadID = user === "josh" ? jlast : elast;
+    let scrollTarget = null;
+    if (lastReadID) {
+        const lastReadEl = wrapper.querySelector(`[msg-id="${lastReadID}"]`);
+        if (lastReadEl) {
+            scrollTarget = lastReadEl.nextElementSibling;
+        }
+    }
+    if (scrollTarget) {
+        scrollTarget.scrollIntoView({ block: "start" });
+        initialScrollDone = true;
+    } else if (jlast !== undefined || elast !== undefined) {
+        wrapper.scrollTop = wrapper.scrollHeight;
+        initialScrollDone = true;
+    }
 }
 
 setTimeout(() => {
@@ -75,12 +112,22 @@ document.addEventListener('click', () => {
         notif.currentTime = 0;
     }).catch(e => console.log("Audio not ready yet"));
 }, { once: true });
+socket.on("lastMessage", (data) => {
+	jlast = data.jlast;
+	elast = data.elast;
+	if (historyLoaded && !initialScrollDone) {
+		scrollToUnread();
+	}
+});
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
         notif.play().catch(e => console.warn("Audio play blocked:", e));
         document.title = `(${++newMsgs}) ${defaultTitle}`;
-    }
+    } else {
+		const lastID = getLastMessageID();
+		socket.emit("focused", {room: chatType, user: user, lastID: lastID});
+	}
 });
 
 socket.on("message_deleted", (id) => {
@@ -187,7 +234,7 @@ const msg = `Hello :D, here's some information:\n
     try {
         socket.emit('send_message', msgData);
         messageInput.value = '';
-        if (Rid != null) replyIndicator.style.display = "flex" ? replyIndicator.style.display = "none" : null;
+        if (Rid != null) replyIndicator.style.display = "none";
         cancelReply();
     } catch (err) {
         console.error("Error sending message:", err);
@@ -236,7 +283,7 @@ function renderMessage(msg) {
     const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
 
-    let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
+    let displayName = isJosh ? "Josh" : ((window.user2Name && senderLower === window.user2Name.toLowerCase()) ? window.user2Name : "Anonymous");
     if(isSystem) {
         messageElement.style.marginLeft = "auto";
         messageElement.style.marginRight = "auto";
@@ -245,8 +292,9 @@ function renderMessage(msg) {
         displayName = "System";
     }    
     messageElement.style.border = `2px solid ${themeColor}`;
-	const sentHour = parseInt(msg.timestamp.split(":")[0]);
-	const sentMinute = parseInt(msg.timestamp.split(":")[1]);
+	const timeParts = msg.timestamp ? msg.timestamp.split(":") : [];
+	const sentHour = timeParts[0] ? parseInt(timeParts[0]) : 0;
+	const sentMinute = timeParts[1] ? parseInt(timeParts[1]) : 0;
     const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
 	if (sentHour !== lastSentHour || sentMinute - lastSentMinute > 5) {
 		messageElement.style.marginTop = "5em";
@@ -292,23 +340,27 @@ async function loadHistory() {
     try {
         const res = await fetch(`${CLOUD_URL}/${endpoint}`);
         const messages = await res.json();
-        wrapper.innerHTML = ''; 
+        wrapper.innerHTML = '';
         messages.forEach(renderMessage);
         msgCount = messages.length;
-        
-        // Scroll to bottom of chat
-        wrapper.scrollTop = wrapper.scrollHeight;
-        
-        // Double-check scrolling after browser layout paints
-        requestAnimationFrame(() => {
+        historyLoaded = true;
+
+        if (chatType === 'private') {
+            if (jlast !== undefined || elast !== undefined) {
+                requestAnimationFrame(scrollToUnread);
+            } else {
+                // Fallback timeout to scroll to bottom if lastMessage event doesn't arrive in 1.5s
+                setTimeout(() => {
+                    if (!initialScrollDone) {
+                        wrapper.scrollTop = wrapper.scrollHeight;
+                        initialScrollDone = true;
+                    }
+                }, 1500);
+            }
+        } else {
             wrapper.scrollTop = wrapper.scrollHeight;
-        });
-        setTimeout(() => {
-            wrapper.scrollTop = wrapper.scrollHeight;
-        }, 100);
-        setTimeout(() => {
-            wrapper.scrollTop = wrapper.scrollHeight;
-        }, 300);
+            initialScrollDone = true;
+        }
     } catch (err) {
         console.error("Failed to load history:", err);
     } finally {
@@ -319,16 +371,18 @@ async function loadHistory() {
 
 
 document.addEventListener('visibilitychange', () => {
-    if(document.hidden){
-    hasFocus = false
-    console.log("unfocused");
-    socket.emit("unfocused", {room:chatType, user: user})}
-    else{
-    console.log("focused")
-    socket.emit("focused", {room:chatType, user: user})
-    document.title = defaultTitle;
-    newMsgs = 0;
-    hasFocus = true;}
+    if (document.hidden) {
+        hasFocus = false;
+        console.log("unfocused");
+        socket.emit("unfocused", {room: chatType, user: user});
+    } else {
+        console.log("focused");
+        const lastID = getLastMessageID();
+        socket.emit("focused", {room: chatType, user: user, lastID: lastID});
+        document.title = defaultTitle;
+        newMsgs = 0;
+        hasFocus = true;
+    }
 });
 
 wrapper.addEventListener('contextmenu', (event) => {
@@ -346,8 +400,13 @@ wrapper.addEventListener('contextmenu', (event) => {
 if (isMobile == false) {
     wrapper.addEventListener('click', (event) => {
         clicked = clicked ? clicked : true;
-        event.preventDefault();
-        selectReply();
+        const selected = event.target.closest(".messageBox");
+        if (selected) {
+            event.preventDefault();
+            selectReply(selected);
+        } else {
+            cancelReply();
+        }
     });
 }
 //swipey logic
@@ -360,16 +419,20 @@ wrapper.addEventListener("touchstart", function(e) {
     initialX = e.touches[0].clientX;
     initialY = e.touches[0].clientY;
 	swipedBox = e.target.closest(".messageBox");
-	swipedBox.style.scale = "1.05";
+	if (swipedBox) {
+		swipedBox.style.scale = "1.05";
+	}
 }, false)
 
 wrapper.addEventListener("touchend", function(e) {
     finalX = e.changedTouches[0].clientX;
     finalY = e.changedTouches[0].clientY;
-    if((finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
-        selectReply();
+    if (swipedBox && (finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
+        selectReply(swipedBox);
     }
-	swipedBox.style.scale = "1";
+	if (swipedBox) {
+		swipedBox.style.scale = "1";
+	}
 })
 
 // --- Image paste support ---
@@ -429,7 +492,7 @@ const lightboxImg = document.createElement('img');
 lightboxImg.style.cssText = `
     width: auto !important;
     height: auto !important;
-    /max-width: 95% !important;
+    max-width: 95% !important;
     max-height: 95% !important;
     object-fit: contain !important;
     border-radius: 8px !important;
@@ -459,9 +522,9 @@ function openLightbox(src) {
 }
 
 loadHistory();
-document.addEventListener("DOMContentLoaded", () => {
-    socket.emit("focused", {room:chatType, user:user});
+// Send focused with last message ID after history has had time to load
 setTimeout(() => {
     console.log("Total messages: " + msgCount);
-    
-}, 2000);})
+    const lastID = getLastMessageID();
+    socket.emit("focused", {room: chatType, user: user, lastID: lastID});
+}, 2000);
