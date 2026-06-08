@@ -11,6 +11,7 @@ let lastReplied = null;
 let lastRepliedID = null;
 let msgCount = null;
 let historyLoaded = false;
+let lastMessageReceived = false;
 let initialScrollDone = false;
 const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
@@ -92,7 +93,7 @@ function scrollToUnread() {
         divider.innerHTML = `<p style="color: #ff4444; font-weight: bold; margin: 15px 0;">── New Messages ──</p>`;
         wrapper.insertBefore(divider, scrollTarget);
 
-        scrollTarget.scrollIntoView({ block: "start" });
+        divider.scrollIntoView({ block: "start" });
         initialScrollDone = true;
 
         const initialScrollTop = wrapper.scrollTop;
@@ -126,7 +127,7 @@ function scrollToUnread() {
             threshold: 0.1
         });
         observer.observe(divider);
-    } else if (jlast !== undefined || elast !== undefined) {
+    } else {
         wrapper.scrollTop = wrapper.scrollHeight;
         initialScrollDone = true;
     }
@@ -152,6 +153,7 @@ document.addEventListener('click', () => {
 socket.on("lastMessage", (data) => {
 	jlast = data.jlast;
 	elast = data.elast;
+	lastMessageReceived = true;
 	if (historyLoaded && !initialScrollDone) {
 		scrollToUnread();
 	}
@@ -402,16 +404,8 @@ async function loadHistory() {
         historyLoaded = true;
 
         if (chatType === 'private') {
-            if (jlast !== undefined || elast !== undefined) {
-                requestAnimationFrame(scrollToUnread);
-            } else {
-                // Fallback timeout to scroll to bottom if lastMessage event doesn't arrive in 1.5s
-                setTimeout(() => {
-                    if (!initialScrollDone) {
-                        wrapper.scrollTop = wrapper.scrollHeight;
-                        initialScrollDone = true;
-                    }
-                }, 1500);
+            if (lastMessageReceived) {
+                scrollToUnread();
             }
         } else {
             wrapper.scrollTop = wrapper.scrollHeight;
