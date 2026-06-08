@@ -11,7 +11,6 @@ let lastReplied = null;
 let lastRepliedID = null;
 let msgCount = null;
 let historyLoaded = false;
-let lastMessageReceived = false;
 let initialScrollDone = false;
 const isMobile = isTouchDevice;
 const messageInput = document.getElementById('userMsg2');
@@ -88,46 +87,9 @@ function scrollToUnread() {
         }
     }
     if (scrollTarget) {
-        const divider = document.createElement('div');
-        divider.classList.add('dIndicator');
-        divider.innerHTML = `<p style="color: #ff4444; font-weight: bold; margin: 15px 0;">── New Messages ──</p>`;
-        wrapper.insertBefore(divider, scrollTarget);
-
-        divider.scrollIntoView({ block: "start" });
+        scrollTarget.scrollIntoView({ block: "start" });
         initialScrollDone = true;
-
-        const initialScrollTop = wrapper.scrollTop;
-        let hasEnteredViewport = false;
-
-        const removeDivider = () => {
-            if (wrapper.contains(divider)) {
-                divider.remove();
-            }
-            wrapper.removeEventListener('scroll', onScroll);
-            observer.disconnect();
-        };
-
-        const onScroll = () => {
-            if (wrapper.scrollTop > initialScrollTop + 50) {
-                removeDivider();
-            }
-        };
-        wrapper.addEventListener('scroll', onScroll);
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    hasEnteredViewport = true;
-                } else if (hasEnteredViewport) {
-                    removeDivider();
-                }
-            });
-        }, {
-            root: wrapper,
-            threshold: 0.1
-        });
-        observer.observe(divider);
-    } else {
+    } else if (jlast !== undefined || elast !== undefined) {
         wrapper.scrollTop = wrapper.scrollHeight;
         initialScrollDone = true;
     }
@@ -153,7 +115,6 @@ document.addEventListener('click', () => {
 socket.on("lastMessage", (data) => {
 	jlast = data.jlast;
 	elast = data.elast;
-	lastMessageReceived = true;
 	if (historyLoaded && !initialScrollDone) {
 		scrollToUnread();
 	}
@@ -174,25 +135,6 @@ socket.on("message_deleted", (id) => {
     if (msgElement) {
         wrapper.removeChild(msgElement);
 		console.log("A message was deleted");
-    }
-});
-
-socket.on("message_edited", (data) => {
-    const { id, newText } = data;
-    const msgElement = wrapper.querySelector(`.messageBox[msg-id='${id}']`);
-    if (msgElement) {
-        const textEl = msgElement.querySelector('.messageText');
-        if (textEl) {
-            textEl.textContent = newText;
-        }
-        const timestampEl = msgElement.querySelector('.timestamp');
-        if (timestampEl && !timestampEl.querySelector('.edited-tag')) {
-            const editedTag = document.createElement('i');
-            editedTag.className = 'edited-tag';
-            editedTag.style.cssText = 'font-style: italic; font-size: 0.8em; margin-left: 5px;';
-            editedTag.textContent = '(edited)';
-            timestampEl.appendChild(editedTag);
-        }
     }
 });
 
@@ -365,7 +307,7 @@ function renderMessage(msg) {
             ? `<img class="messageText" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
             : `<p class="messageText"></p>`
         }
-        <h6 class="timestamp">${msg.timestamp || ""}${msg.edited ? ` <i class="edited-tag" style="font-style: italic; font-size: 0.8em; margin-left: 5px;">(edited)</i>` : ""}</h6>
+        <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
     if (!isImage) {
         messageElement.querySelector('.messageText').textContent = msg.text || "";
@@ -404,8 +346,16 @@ async function loadHistory() {
         historyLoaded = true;
 
         if (chatType === 'private') {
-            if (lastMessageReceived) {
-                scrollToUnread();
+            if (jlast !== undefined || elast !== undefined) {
+                requestAnimationFrame(scrollToUnread);
+            } else {
+                // Fallback timeout to scroll to bottom if lastMessage event doesn't arrive in 1.5s
+                setTimeout(() => {
+                    if (!initialScrollDone) {
+                        wrapper.scrollTop = wrapper.scrollHeight;
+                        initialScrollDone = true;
+                    }
+                }, 1500);
             }
         } else {
             wrapper.scrollTop = wrapper.scrollHeight;
@@ -439,36 +389,12 @@ wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
     if (!selected) return;
-    const senderHeader = selected.querySelector("h4");
-    if (!senderHeader) return;
-    if (senderHeader.textContent.toLowerCase() === user.toLowerCase()) {
-        const textEl = selected.querySelector(".messageText");
-        const isImage = textEl && textEl.tagName === 'IMG';
-        const currentText = isImage ? "" : (textEl?.textContent || "");
-        const ID = selected.getAttribute("msg-id");
-
-        if (isImage) {
-            const confirmed = window.confirm("Are you sure you want to delete this image?");
-            if (confirmed) {
-                socket.emit("delete_message", { room: chatType, id: ID });
-            }
-        } else {
-            const editOrDelete = window.confirm("Do you want to EDIT this message? (Click Cancel to DELETE)");
-            if (editOrDelete) {
-                const newText = window.prompt("Edit message:", currentText);
-                if (newText !== null) {
-                    const trimmed = newText.trim();
-                    if (trimmed !== "" && trimmed !== currentText) {
-                        socket.emit("edit_message", { room: chatType, id: ID, newText: trimmed });
-                    }
-                }
-            } else {
-                const confirmed = window.confirm(`Are you sure you want to delete message: "${currentText}"?`);
-                if (confirmed) {
-                    socket.emit("delete_message", { room: chatType, id: ID });
-                }
-            }
-        }
+	if (selected.querySelector("h4").textContent.toLowerCase() === user) {
+	const confirmed = window.confirm(`Are you sure you want to delete message: "${selected.querySelector(".messageText").textContent}"`);
+	if (confirmed === true) {
+    const ID = selected.getAttribute("msg-id");
+    	socket.emit("delete_message", {room: chatType, id: ID});
+	}
     }
 });
 if (isMobile == false) {
