@@ -78,6 +78,7 @@ document.addEventListener('click', () => {
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
+	    if(site != "echat")
         notif.play().catch(e => console.warn("Audio play blocked:", e));
         document.title = `(${++newMsgs}) ${defaultTitle}`;
     }
