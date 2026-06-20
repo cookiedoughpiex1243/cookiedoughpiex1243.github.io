@@ -27,7 +27,16 @@ const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 let myLastReadID = null;
 let lastReadResolve;
 const lastReadPromise = (chatType === 'private')
-    ? new Promise(resolve => { lastReadResolve = resolve; })
+    ? new Promise(resolve => { 
+        lastReadResolve = resolve;
+        setTimeout(() => {
+            if (lastReadResolve) {
+                console.warn("lastReadPromise timed out.");
+                lastReadResolve();
+                lastReadResolve = null;
+            }
+        }, 3000);
+      })
     : Promise.resolve(); // public chat doesn't use unread scroll
 
 function sendSystemMessage(msg) {
