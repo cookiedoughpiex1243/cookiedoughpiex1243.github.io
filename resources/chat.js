@@ -63,8 +63,11 @@ setTimeout(() => {
     console.log("Touchscreen: "+isMobile);
 }, 500);
 
-//Join socket room(idk) on connecting
+//Join socket room on connecting, then immediately announce our own focus state
 socket.emit('join_room', chatType);
+if (chatType === 'private') {
+    socket.emit("focused", {room: chatType, user: user, lastID: null});
+}
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;
 let newMsgs = 0;
@@ -90,7 +93,7 @@ socket.on("jFocused", () => {
 if(site=="echat")messageInput.placeholder = "Josh is Online"});
 socket.on("eGone", () => {
 	if(site=="jchat")messageInput.placeholder = "Type to send a message...";});
-socket.on("JGone", () => {
+socket.on("jGone", () => {
 	if(site=="echat")messageInput.placeholder = "Type to send a message...";});
 
 
@@ -472,8 +475,8 @@ function openLightbox(src) {
 
 loadHistory();
 document.addEventListener("DOMContentLoaded", () => {
-    socket.emit("focused", {room:chatType, user:user});
-setTimeout(() => {
-    console.log("Total messages: " + msgCount);
-    
-}, 2000);})
+    // focused is already emitted right after join_room above
+    setTimeout(() => {
+        console.log("Total messages: " + msgCount);
+    }, 2000);
+})
