@@ -89,9 +89,9 @@ socket.on("eFocused", () => {
 socket.on("jFocused", () => {
 if(site=="echat")messageInput.placeholder = "Josh is Online"});
 socket.on("eGone", () => {
-	if(site=="jchat")mesageInput.placeholder = "Type to send a message...";});
+	if(site=="jchat")messageInput.placeholder = "Type to send a message...";});
 socket.on("JGone", () => {
-	if(site=="echat")mesageInput.placeholder = "Type to send a message...";});
+	if(site=="echat")messageInput.placeholder = "Type to send a message...";});
 
 
 
