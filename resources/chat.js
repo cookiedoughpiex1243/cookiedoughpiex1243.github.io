@@ -23,6 +23,13 @@ const user = sessionStorage.getItem("user") || "anonymous";
 
 const chatType = (site === "echat" || site === "jchat") ? "private" : "public";
 
+// --- Last-read tracking for scroll-to-unread ---
+let myLastReadID = null;
+let lastReadResolve;
+const lastReadPromise = (chatType === 'private')
+    ? new Promise(resolve => { lastReadResolve = resolve; })
+    : Promise.resolve(); // public chat doesn't use unread scroll
+
 function sendSystemMessage(msg) {
     const msgData = {
         text: msg,
@@ -58,16 +65,20 @@ function selectReply() {
     replyIndicator.style.display = "flex";
 }
 
-setTimeout(() => {
-    document.body.style.display = "flex";
-    console.log("Touchscreen: "+isMobile);
-}, 500);
+document.body.style.display = "flex";
+console.log("Touchscreen: "+isMobile);
 
 //Join socket room on connecting, then immediately announce our own focus state
-socket.emit('join_room', chatType);
+socket.emit('join_room', { room: chatType, user: user });
 if (chatType === 'private') {
     socket.emit("focused", {room: chatType, user: user, lastID: null});
 }
+
+// Receive our own last-read cursor from the server
+socket.on("myLastRead", (id) => {
+    myLastReadID = id;
+    if (lastReadResolve) { lastReadResolve(); lastReadResolve = null; }
+});
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;
 let newMsgs = 0;
@@ -305,25 +316,49 @@ async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     isHistoryLoading = true;
     try {
-        const res = await fetch(`${CLOUD_URL}/${endpoint}`);
+        // Wait for both the history fetch AND the myLastRead socket event
+        const [res] = await Promise.all([
+            fetch(`${CLOUD_URL}/${endpoint}`),
+            lastReadPromise,
+        ]);
         const messages = await res.json();
         wrapper.innerHTML = ''; 
         messages.forEach(renderMessage);
         msgCount = messages.length;
+        console.log("Total messages: " + msgCount);
         
-        // Scroll to bottom of chat
-        wrapper.scrollTop = wrapper.scrollHeight;
-        
-        // Double-check scrolling after browser layout paints
+        // --- Scroll to first unread, or bottom if all read ---
+        let scrollTarget = null;
+        if (myLastReadID && chatType === "private") {
+            const allBoxes = wrapper.querySelectorAll('.messageBox');
+            let foundLastRead = false;
+            for (const box of allBoxes) {
+                const msgId = Number(box.getAttribute('msg-id'));
+                if (msgId === Number(myLastReadID)) {
+                    foundLastRead = true;
+                    continue;
+                }
+                if (foundLastRead) {
+                    scrollTarget = box;
+                    break;
+                }
+            }
+        }
+
+        if (scrollTarget) {
+            scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
+        } else {
+            wrapper.scrollTop = wrapper.scrollHeight;
+        }
+
+        // One rAF is enough to catch the post-layout paint
         requestAnimationFrame(() => {
-            wrapper.scrollTop = wrapper.scrollHeight;
+            if (scrollTarget) {
+                scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
+            } else {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            }
         });
-        setTimeout(() => {
-            wrapper.scrollTop = wrapper.scrollHeight;
-        }, 100);
-        setTimeout(() => {
-            wrapper.scrollTop = wrapper.scrollHeight;
-        }, 300);
     } catch (err) {
         console.error("Failed to load history:", err);
     } finally {
@@ -340,7 +375,11 @@ document.addEventListener('visibilitychange', () => {
     socket.emit("unfocused", {room:chatType, user: user})}
     else{
     console.log("focused")
-    socket.emit("focused", {room:chatType, user: user})
+    // Get the last rendered message ID to update the server's read cursor
+    const allBoxes = wrapper.querySelectorAll('.messageBox');
+    const lastBox = allBoxes[allBoxes.length - 1];
+    const lastID = lastBox ? Number(lastBox.getAttribute('msg-id')) : null;
+    socket.emit("focused", {room:chatType, user: user, lastID: lastID})
     document.title = defaultTitle;
     newMsgs = 0;
     hasFocus = true;}
@@ -474,9 +513,3 @@ function openLightbox(src) {
 }
 
 loadHistory();
-document.addEventListener("DOMContentLoaded", () => {
-    // focused is already emitted right after join_room above
-    setTimeout(() => {
-        console.log("Total messages: " + msgCount);
-    }, 2000);
-})
