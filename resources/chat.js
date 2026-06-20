@@ -84,6 +84,17 @@ socket.on('receive_message', (msg) => {
     }
 });
 
+socket.on("eFocused", () => {
+    if(site == "jchat")messageInput.placeholder = "ykw is Online.";});
+socket.on("jFocused", () => {
+if(site=="echat")messageInput.placeholder = "Josh is Online"});
+socket.on("eGone", () => {
+	if(site=="jchat")mesageInput.placeholder = "Type to send a message...";});
+socket.on("JGone", () => {
+	if(site=="echat")mesageInput.placeholder = "Type to send a message...";});
+
+
+
 socket.on("message_deleted", (id) => {
     const msgElement = wrapper.querySelector(`.messageBox[msg-id='${id}']`);
     if (msgElement) {
