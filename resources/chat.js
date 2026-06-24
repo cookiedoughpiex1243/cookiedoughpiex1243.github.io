@@ -91,13 +91,7 @@ socket.on("myLastRead", (id) => {
 const notif = new Audio('resources/notification.mp3');
 const defaultTitle = document.title;
 let newMsgs = 0;
-//Da thing to make sure sound not autoblocked(USELESS :(  )
-document.addEventListener('click', () => {
-    notif.play().then(() => {
-        notif.pause();
-        notif.currentTime = 0;
-    }).catch(e => console.log("Audio not ready yet"));
-}, { once: true });
+
 socket.on('receive_message', (msg) => {
     renderMessage(msg);
     if(!hasFocus) {
