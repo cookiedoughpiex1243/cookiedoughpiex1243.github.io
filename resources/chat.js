@@ -164,7 +164,8 @@ async function sendMessage() {
         return;}
     switch(message) {
         case '/logout':
-            setTimeout(() => {isTyping = false;}, 100);
+        socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
+            
             sessionStorage.removeItem('loggedIn');
             sessionStorage.setItem('site', 'login');
             window.location.replace("login");
