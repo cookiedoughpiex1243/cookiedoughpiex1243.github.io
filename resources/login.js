@@ -1,4 +1,14 @@
-if (!sessionStorage.getItem("site")) {
+async function getPublicIP() {
+    try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        console.log('Public IP:', data.ip);
+        return data.ip;
+    } catch (error) {
+        console.error('Error fetching IP:', error);
+    }
+}
+
     sessionStorage.setItem("site", "login");
 };
 const message = document.getElementById('message');
@@ -42,7 +52,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     document.addEventListener("pagehide", () => {
       message.innerText = "";
     })}, 250);
-    }
+    } console.log(getPublicIP());
   }
   else {
     setTimeout (() => {

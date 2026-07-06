@@ -172,6 +172,11 @@ async function sendMessage() {
             messageInput.value = ''; 
             return;
             break;
+            case '/back':
+                socket.emit('stop_typing', { room: chatType, user: user }); isTyping = false;
+                user == 'josh' ? window.location.href='loggedin': history.back();
+                return;
+                break;
         case '/help':
 const msg = `Hello :D, here's some information:\n
 /logout to logout (or just redirect to login page)\n
