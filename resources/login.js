@@ -8,9 +8,10 @@ async function getPublicIP() {
         console.error('Error fetching IP:', error);
     }
 }
+if (!sessionStorage.getItem("site")) {
 
     sessionStorage.setItem("site", "login");
-};
+}
 const message = document.getElementById('message');
 
 async function hashPassword(password) {
