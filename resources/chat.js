@@ -78,10 +78,12 @@ document.body.style.display = "flex";
 console.log("Touchscreen: "+isMobile);
 
 //Join socket room on connecting, then immediately announce our own focus state
-socket.emit('join_room', { room: chatType, user: user });
-if (chatType === 'private') {
-    socket.emit("focused", {room: chatType, user: user, lastID: null});
-}
+socket.on('connect', () => {
+    socket.emit('join_room', { room: chatType, user: user });
+    if (chatType === 'private') {
+        socket.emit("focused", {room: chatType, user: user, lastID: null});
+    }
+});
 
 // Receive our own last-read cursor from the server
 socket.on("myLastRead", (id) => {
