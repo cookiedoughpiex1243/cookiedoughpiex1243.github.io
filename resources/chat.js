@@ -236,62 +236,54 @@ sendbtn.addEventListener('click', sendMessage);
 
 let isHistoryLoading = false;
 
-function renderMessage(msg) {
-    if (!wrapper || !msg) return;
+function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;
-	const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
+    const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
-    const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
-    const shouldAutoscroll = distanceToBottom < 400;
     const isMe = (user.toLowerCase() === senderLower);
     const isJosh = (senderLower === "josh");
     const isSystem = (senderLower === "system");
 
-    if (sentDate != lastSentDate) {
-       const dIndicator = document.createElement('div');
+    let dIndicator = null;
+    if (sentDate != prevDate) {
+       dIndicator = document.createElement('div');
        dIndicator.classList.add('dIndicator');
-       dIndicator.innerHTML = `
-       <p><b>${sentDate}</b></p>
-       `;
-       wrapper.appendChild(dIndicator);
+       dIndicator.innerHTML = `<p><b>${sentDate}</b></p>`;
     }
+    
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
     messageElement.setAttribute('msg-id', msg.id || Date.now());
 
-
-    
     if (isMe) {
         messageElement.style.marginLeft = "auto";
     }
 
-
     let themeColor = isJosh ? "#00ffff" : "#ff00ff";
-    const oppositeThemeColor = isJosh ? "#ea00ff":"#00ffff";
     const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
 
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
         messageElement.style.marginLeft = "auto";
         messageElement.style.marginRight = "auto";
-		messageElement.style.alignItems = "center";
+        messageElement.style.alignItems = "center";
         themeColor = "red";
         displayName = "System";
     }    
     messageElement.style.border = `2px solid ${themeColor}`;
-	const sentHour = parseInt(msg.timestamp.split(":")[0]);
-	const sentMinute = parseInt(msg.timestamp.split(":")[1]);
+    const sentHour = parseInt(msg.timestamp.split(":")[0]);
+    const sentMinute = parseInt(msg.timestamp.split(":")[1]);
     const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
-	if (sentHour !== lastSentHour || sentMinute - lastSentMinute > 5) {
-		messageElement.style.marginTop = "5em";
-		}
+    if (sentHour !== prevHour || sentMinute - prevMinute > 5) {
+        messageElement.style.marginTop = "5em";
+    }
 
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
         ${msgRid !== null ? (`<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
         ${isImage
-            ? `<img class="messageText" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
+            ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
             : `<p class="messageText"></p>`
         }
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
@@ -305,36 +297,119 @@ function renderMessage(msg) {
             e.preventDefault();
             openLightbox(msg.text);
         });
-        img.addEventListener('load', () => {
-            const currentDistance = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
-            if (currentDistance < 400) {
-                wrapper.scrollTop = wrapper.scrollHeight;
-            }
-        });
     }
+    
+    return { dIndicator, messageElement, sentDate, sentHour, sentMinute };
+}
+
+function renderMessage(msg) {
+    if (!wrapper || !msg) return;
+    const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
+    const shouldAutoscroll = distanceToBottom < 400;
+
+    const { dIndicator, messageElement, sentDate, sentHour, sentMinute } = buildMessageDOM(msg, lastSentDate, lastSentHour, lastSentMinute);
+    
+    if (dIndicator) wrapper.appendChild(dIndicator);
     wrapper.appendChild(messageElement);
+
     if (!isHistoryLoading && shouldAutoscroll) {
         wrapper.scrollTop = wrapper.scrollHeight;
-	}
-	lastSentDate = sentDate;
-	lastSentHour = sentHour;
-	lastSentMinute = sentMinute;
+    }
+    lastSentDate = sentDate;
+    lastSentHour = sentHour;
+    lastSentMinute = sentMinute;
+}
+
+let oldestMessageID = null;
+let hasMoreMessages = true;
+let isFetchingMore = false;
+let scrollSentinel = null;
+
+async function fetchMoreMessages() {
+    if (!oldestMessageID || !hasMoreMessages || isFetchingMore) return;
+    isFetchingMore = true;
+    
+    const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
+    try {
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?before=${oldestMessageID}`);
+        const messages = await res.json();
+        
+        if (messages.length === 0) {
+            hasMoreMessages = false;
+            return;
+        }
+        
+        oldestMessageID = messages[0].id;
+        const prevScrollHeight = wrapper.scrollHeight;
+        
+        if (scrollSentinel && scrollSentinel.parentNode) {
+            scrollSentinel.parentNode.removeChild(scrollSentinel);
+        }
+        
+        const fragment = document.createDocumentFragment();
+        let localLastDate = null;
+        let localLastHour = null;
+        let localLastMinute = null;
+        
+        messages.forEach(msg => {
+            const elData = buildMessageDOM(msg, localLastDate, localLastHour, localLastMinute);
+            if (elData.dIndicator) fragment.appendChild(elData.dIndicator);
+            fragment.appendChild(elData.messageElement);
+            localLastDate = elData.sentDate;
+            localLastHour = elData.sentHour;
+            localLastMinute = elData.sentMinute;
+        });
+        
+        wrapper.prepend(fragment);
+        if (hasMoreMessages) wrapper.prepend(scrollSentinel);
+        
+        wrapper.scrollTop = wrapper.scrollTop + (wrapper.scrollHeight - prevScrollHeight);
+    } catch (e) {
+        console.error("fetch more error", e);
+    } finally {
+        isFetchingMore = false;
+    }
+}
+
+function initIntersectionObserver() {
+    if (scrollSentinel) return;
+    scrollSentinel = document.createElement('div');
+    scrollSentinel.style.height = '1px';
+    scrollSentinel.id = 'scroll-sentinel';
+    
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isHistoryLoading) {
+            fetchMoreMessages();
+        }
+    }, { root: wrapper, rootMargin: "200px" });
+    
+    observer.observe(scrollSentinel);
 }
 
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     isHistoryLoading = true;
     try {
-        // Wait for both the history fetch AND the myLastRead socket event
         const [res] = await Promise.all([
             fetch(`${CLOUD_URL}/${endpoint}`),
             lastReadPromise,
         ]);
         const messages = await res.json();
         wrapper.innerHTML = ''; 
+        
+        if (messages.length > 0) {
+            oldestMessageID = messages[0].id;
+        }
+        if (messages.length < 50) {
+            hasMoreMessages = false;
+        }
+        
         messages.forEach(renderMessage);
-        msgCount = messages.length;
-        console.log("Total messages: " + msgCount);
+        
+        if (hasMoreMessages) {
+            initIntersectionObserver();
+            wrapper.prepend(scrollSentinel);
+        }
         
         // --- Scroll to first unread, or bottom if all read ---
         let scrollTarget = null;
@@ -360,7 +435,6 @@ async function loadHistory() {
             wrapper.scrollTop = wrapper.scrollHeight;
         }
 
-        // One rAF is enough to catch the post-layout paint
         requestAnimationFrame(() => {
             if (scrollTarget) {
                 scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
