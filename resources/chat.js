@@ -1,4 +1,4 @@
-const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+const CLOUD_URL = "http://localhost:3000";
 const socket = io(CLOUD_URL);
 
 let clicked = false;
@@ -340,12 +340,6 @@ async function fetchMoreMessages() {
         }
         
         oldestMessageID = messages[0].id;
-        const prevScrollHeight = wrapper.scrollHeight;
-        
-        if (scrollSentinel && scrollSentinel.parentNode) {
-            scrollSentinel.parentNode.removeChild(scrollSentinel);
-        }
-        
         const fragment = document.createDocumentFragment();
         let localLastDate = null;
         let localLastHour = null;
@@ -360,10 +354,11 @@ async function fetchMoreMessages() {
             localLastMinute = elData.sentMinute;
         });
         
+        // Native scroll anchoring (overflow-anchor: auto) automatically maintains the scroll position
         wrapper.prepend(fragment);
         if (hasMoreMessages) wrapper.prepend(scrollSentinel);
         
-        wrapper.scrollTop = wrapper.scrollTop + (wrapper.scrollHeight - prevScrollHeight);
+        cleanupDateMarkers();
     } catch (e) {
         console.error("fetch more error", e);
     } finally {
@@ -384,6 +379,19 @@ function initIntersectionObserver() {
     }, { root: wrapper, rootMargin: "200px" });
     
     observer.observe(scrollSentinel);
+}
+
+function cleanupDateMarkers() {
+    const indicators = wrapper.querySelectorAll('.dIndicator');
+    let lastSeenDate = null;
+    indicators.forEach(ind => {
+        const dateText = ind.textContent.trim();
+        if (dateText === lastSeenDate) {
+            ind.remove();
+        } else {
+            lastSeenDate = dateText;
+        }
+    });
 }
 
 async function loadHistory() {
@@ -410,6 +418,8 @@ async function loadHistory() {
             initIntersectionObserver();
             wrapper.prepend(scrollSentinel);
         }
+        
+        cleanupDateMarkers();
         
         // --- Scroll to first unread, or bottom if all read ---
         let scrollTarget = null;
