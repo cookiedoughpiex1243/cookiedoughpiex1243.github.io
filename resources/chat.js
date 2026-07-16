@@ -578,10 +578,14 @@ async function loadHistory() {
             fixupReplies();
             cleanupDateMarkers();
             
-            // Scroll to the first unread message
-            const firstUnread = unreadMsgs.length > 0
-                ? wrapper.querySelector(`[msg-id="${unreadMsgs[0].id}"]`)
-                : null;
+            // Scroll to the first unread message (first box with id > myLastReadID)
+            let firstUnread = null;
+            for (const box of wrapper.querySelectorAll('.messageBox')) {
+                if (Number(box.getAttribute('msg-id')) > Number(myLastReadID)) {
+                    firstUnread = box;
+                    break;
+                }
+            }
             const scrollTo = firstUnread || wrapper.lastElementChild;
             if (scrollTo) {
                 scrollTo.scrollIntoView({ behavior: 'instant', block: 'start' });
@@ -612,11 +616,12 @@ async function loadHistory() {
         let scrollTarget = null;
         if (myLastReadID && chatType === "private") {
             const allBoxes = wrapper.querySelectorAll('.messageBox');
-            let foundLastRead = false;
             for (const box of allBoxes) {
                 const msgId = Number(box.getAttribute('msg-id'));
-                if (msgId === Number(myLastReadID)) { foundLastRead = true; continue; }
-                if (foundLastRead) { scrollTarget = box; break; }
+                if (msgId > Number(myLastReadID)) {
+                    scrollTarget = box;
+                    break;
+                }
             }
         }
 
