@@ -125,7 +125,6 @@
     overflow-y: auto;
     box-sizing: border-box;
     scroll-behavior: smooth;
-    overflow-anchor: none;
  }
  .cwrapper::-webkit-scrollbar {
     display: none;

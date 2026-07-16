@@ -95,7 +95,13 @@ const defaultTitle = document.title;
 let newMsgs = 0;
 
 socket.on('receive_message', (msg) => {
-    renderMessage(msg);
+    if (!hasNewerMessages) {
+        renderMessage(msg);
+    } else {
+        // User is mid-history; track but don't append yet
+        pendingLiveMsgCount++;
+        updateNewMsgBadge();
+    }
     if(!hasFocus) {
 	    if(site != "echat")
         notif.play().catch(e => console.warn("Audio play blocked:", e));
@@ -238,8 +244,36 @@ sendbtn.addEventListener('click', sendMessage);
 
 let isHistoryLoading = false;
 
+// --- Pagination state ---
+let oldestMessageID = null;    // oldest rendered — scroll UP loads before this
+let newestLoadedID = null;     // newest rendered via REST — scroll DOWN loads after this
+let hasMoreMessages = true;    // can we scroll up for more?
+let hasNewerMessages = false;  // are we mid-history (gap between rendered and actual newest)?
+let isFetchingMore = false;
+let scrollSentinel = null;     // top sentinel (load older)
+let bottomSentinel = null;     // bottom sentinel (load newer)
+let pendingLiveMsgCount = 0;   // live messages received while mid-history
+
+// Badge that shows when live messages arrive while user is mid-history
+let newMsgBadge = null;
+function updateNewMsgBadge() {
+    if (!newMsgBadge) {
+        newMsgBadge = document.createElement('div');
+        newMsgBadge.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#00ffff;color:#0b0c10;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:bold;z-index:1000;box-shadow:0 2px 12px rgba(0,255,255,0.4);';
+        newMsgBadge.addEventListener('click', () => { wrapper.scrollTop = wrapper.scrollHeight; });
+        document.body.appendChild(newMsgBadge);
+    }
+    if (pendingLiveMsgCount > 0) {
+        newMsgBadge.textContent = `⬇ ${pendingLiveMsgCount} new`;
+        newMsgBadge.style.display = 'block';
+    } else {
+        newMsgBadge.style.display = 'none';
+    }
+}
+
 function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;
+    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
     const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
@@ -257,6 +291,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
     messageElement.setAttribute('msg-id', msg.id || Date.now());
+    if (msg.Rid) messageElement.setAttribute('data-rid', msg.Rid);
 
     if (isMe) {
         messageElement.style.marginLeft = "auto";
@@ -264,7 +299,6 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
 
     let themeColor = isJosh ? "#00ffff" : "#ff00ff";
     const oppositeThemeColor = isJosh ? "#ea00ff" : "#00ffff";
-    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || oppositeThemeColor) : null;
 
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
@@ -282,9 +316,19 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         messageElement.style.marginTop = "5em";
     }
 
+    // If reply target is in DOM, resolve it now. Otherwise mark as pending.
+    let replyHTML = '';
+    if (msg.Rid) {
+        if (msgRid !== null) {
+            replyHTML = `<h6 style="color: ${replyColor || oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`;
+        } else {
+            replyHTML = `<h6 class="reply-pending" style="color: ${oppositeThemeColor}"><i>Reply: ...</i></h6>`;
+        }
+    }
+
     messageElement.innerHTML = `
         <h4 style="color: ${themeColor}">${displayName}</h4>
-        ${msgRid !== null ? (`<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`) : ""}
+        ${replyHTML}
         ${isImage
             ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
             : `<p class="messageText"></p>`
@@ -305,6 +349,24 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     return { dIndicator, messageElement, sentDate, sentHour, sentMinute, isImage };
 }
 
+// After inserting into DOM, resolve any reply-pending placeholders
+function fixupReplies() {
+    wrapper.querySelectorAll('.reply-pending').forEach(h6 => {
+        const box = h6.closest('[data-rid]');
+        if (!box) return;
+        const rid = box.getAttribute('data-rid');
+        const target = wrapper.querySelector(`[msg-id="${rid}"]`);
+        if (!target) return;
+        const targetText = target.querySelector('.messageText')?.textContent;
+        const targetColor = target.querySelector('h4')?.style.color;
+        if (targetText) {
+            h6.style.color = targetColor || '';
+            h6.innerHTML = `<i>Reply: ${targetText}</i>`;
+            h6.classList.remove('reply-pending');
+        }
+    });
+}
+
 function renderMessage(msg) {
     if (!wrapper || !msg) return;
     const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
@@ -314,6 +376,9 @@ function renderMessage(msg) {
     
     if (dIndicator) wrapper.appendChild(dIndicator);
     wrapper.appendChild(messageElement);
+    fixupReplies();
+
+    newestLoadedID = Math.max(newestLoadedID || 0, msg.id);
 
     if (isImage) {
         const img = messageElement.querySelector('.messageText');
@@ -333,11 +398,6 @@ function renderMessage(msg) {
     lastSentMinute = sentMinute;
 }
 
-let oldestMessageID = null;
-let hasMoreMessages = true;
-let isFetchingMore = false;
-let scrollSentinel = null;
-
 async function fetchMoreMessages() {
     if (!oldestMessageID || !hasMoreMessages || isFetchingMore) return;
     isFetchingMore = true;
@@ -349,6 +409,7 @@ async function fetchMoreMessages() {
         
         if (messages.length === 0) {
             hasMoreMessages = false;
+            if (scrollSentinel?.parentNode) scrollSentinel.parentNode.removeChild(scrollSentinel);
             return;
         }
         
@@ -367,13 +428,52 @@ async function fetchMoreMessages() {
             localLastMinute = elData.sentMinute;
         });
         
-        // Native scroll anchoring (overflow-anchor: auto) automatically maintains the scroll position
+        // Manual scroll anchoring: save position relative to bottom, restore after prepend
+        const prevScrollBottom = wrapper.scrollHeight - wrapper.scrollTop;
         wrapper.prepend(fragment);
+        wrapper.scrollTop = wrapper.scrollHeight - prevScrollBottom;
         if (hasMoreMessages) wrapper.prepend(scrollSentinel);
         
+        fixupReplies();
         cleanupDateMarkers();
     } catch (e) {
         console.error("fetch more error", e);
+    } finally {
+        isFetchingMore = false;
+    }
+}
+
+async function loadNewerMessages() {
+    if (!hasNewerMessages || isFetchingMore || !newestLoadedID) return;
+    isFetchingMore = true;
+    const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
+    try {
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?after=${newestLoadedID}`);
+        const messages = await res.json();
+        
+        // Remove bottom sentinel before appending
+        if (bottomSentinel?.parentNode) bottomSentinel.parentNode.removeChild(bottomSentinel);
+        
+        // Skip any already-rendered messages (safety dedupe)
+        const newMessages = messages.filter(m => !wrapper.querySelector(`[msg-id="${m.id}"]`));
+        newMessages.forEach(renderMessage);
+        
+        if (messages.length > 0) newestLoadedID = messages[messages.length - 1].id;
+        
+        if (messages.length < 50) {
+            // Caught up to latest — turn off mid-history mode
+            hasNewerMessages = false;
+            pendingLiveMsgCount = 0;
+            updateNewMsgBadge();
+        } else {
+            wrapper.appendChild(bottomSentinel);
+        }
+        
+        fixupReplies();
+        cleanupDateMarkers();
+    } catch (e) {
+        console.error("loadNewer error", e);
+        if (bottomSentinel) wrapper.appendChild(bottomSentinel);
     } finally {
         isFetchingMore = false;
     }
@@ -394,6 +494,21 @@ function initIntersectionObserver() {
     observer.observe(scrollSentinel);
 }
 
+function initBottomSentinel() {
+    if (bottomSentinel) return;
+    bottomSentinel = document.createElement('div');
+    bottomSentinel.style.height = '1px';
+    bottomSentinel.id = 'bottom-sentinel';
+    
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !isHistoryLoading) {
+            loadNewerMessages();
+        }
+    }, { root: wrapper, rootMargin: "200px" });
+    
+    observer.observe(bottomSentinel);
+}
+
 function cleanupDateMarkers() {
     const indicators = wrapper.querySelectorAll('.dIndicator');
     let lastSeenDate = null;
@@ -410,45 +525,98 @@ function cleanupDateMarkers() {
 async function loadHistory() {
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     isHistoryLoading = true;
+    hasMoreMessages = true;
+    hasNewerMessages = false;
+    pendingLiveMsgCount = 0;
     try {
         const [res] = await Promise.all([
             fetch(`${CLOUD_URL}/${endpoint}`),
             lastReadPromise,
         ]);
-        const messages = await res.json();
-        wrapper.innerHTML = ''; 
+        const newestMessages = await res.json();
+        wrapper.innerHTML = '';
         
-        if (messages.length > 0) {
-            oldestMessageID = messages[0].id;
+        // Check if lastReadID is within the initial 50 newest messages
+        const lastReadInBatch = myLastReadID
+            ? newestMessages.some(m => m.id === Number(myLastReadID))
+            : true;
+        
+        // --- Many-unread case: lastRead is older than the initial 50 ---
+        if (chatType === 'private' && myLastReadID && !lastReadInBatch && newestMessages.length === 50) {
+            // Fetch context (10 msgs ending at lastRead) + unread (50 msgs after lastRead) in parallel
+            const [contextRes, unreadRes] = await Promise.all([
+                fetch(`${CLOUD_URL}/${endpoint}?before=${Number(myLastReadID) + 1}&limit=10`),
+                fetch(`${CLOUD_URL}/${endpoint}?after=${myLastReadID}&limit=50`)
+            ]);
+            const contextMsgs = await contextRes.json();
+            const unreadMsgs = await unreadRes.json();
+            
+            const allInitial = [...contextMsgs, ...unreadMsgs];
+            allInitial.forEach(renderMessage);
+            
+            if (allInitial.length > 0) {
+                oldestMessageID = allInitial[0].id;
+                // newestLoadedID is updated by renderMessage already
+            }
+            
+            // Top sentinel for loading older context
+            if (contextMsgs.length >= 10) {
+                initIntersectionObserver();
+                wrapper.prepend(scrollSentinel);
+            } else {
+                hasMoreMessages = false;
+            }
+            
+            // Bottom sentinel: is there a gap between our unread batch and the true newest?
+            const newestInFull = newestMessages[newestMessages.length - 1]?.id;
+            if (newestLoadedID && newestInFull && newestLoadedID < newestInFull) {
+                hasNewerMessages = true;
+                initBottomSentinel();
+                wrapper.appendChild(bottomSentinel);
+            }
+            
+            fixupReplies();
+            cleanupDateMarkers();
+            
+            // Scroll to the first unread message
+            const firstUnread = unreadMsgs.length > 0
+                ? wrapper.querySelector(`[msg-id="${unreadMsgs[0].id}"]`)
+                : null;
+            const scrollTo = firstUnread || wrapper.lastElementChild;
+            if (scrollTo) {
+                scrollTo.scrollIntoView({ behavior: 'instant', block: 'start' });
+                requestAnimationFrame(() => scrollTo.scrollIntoView({ behavior: 'instant', block: 'start' }));
+            }
+            return;
         }
-        if (messages.length < 50) {
+        
+        // --- Normal case: show 50 newest, find first unread ---
+        if (newestMessages.length > 0) {
+            oldestMessageID = newestMessages[0].id;
+        }
+        if (newestMessages.length < 50) {
             hasMoreMessages = false;
         }
         
-        messages.forEach(renderMessage);
+        newestMessages.forEach(renderMessage);
         
         if (hasMoreMessages) {
             initIntersectionObserver();
             wrapper.prepend(scrollSentinel);
         }
         
+        fixupReplies();
         cleanupDateMarkers();
         
-        // --- Scroll to first unread, or bottom if all read ---
+        // Scroll to first unread, or bottom
         let scrollTarget = null;
         if (myLastReadID && chatType === "private") {
             const allBoxes = wrapper.querySelectorAll('.messageBox');
             let foundLastRead = false;
             for (const box of allBoxes) {
                 const msgId = Number(box.getAttribute('msg-id'));
-                if (msgId === Number(myLastReadID)) {
-                    foundLastRead = true;
-                    continue;
-                }
-                if (foundLastRead) {
-                    scrollTarget = box;
-                    break;
-                }
+                if (msgId === Number(myLastReadID)) { foundLastRead = true; continue; }
+                if (foundLastRead) { scrollTarget = box; break; }
             }
         }
 
@@ -457,7 +625,6 @@ async function loadHistory() {
         } else {
             wrapper.scrollTop = wrapper.scrollHeight;
         }
-
         requestAnimationFrame(() => {
             if (scrollTarget) {
                 scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
