@@ -263,7 +263,8 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     }
 
     let themeColor = isJosh ? "#00ffff" : "#ff00ff";
-    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
+    const oppositeThemeColor = isJosh ? "#ea00ff" : "#00ffff";
+    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || oppositeThemeColor) : null;
 
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
@@ -301,7 +302,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         });
     }
     
-    return { dIndicator, messageElement, sentDate, sentHour, sentMinute };
+    return { dIndicator, messageElement, sentDate, sentHour, sentMinute, isImage };
 }
 
 function renderMessage(msg) {
@@ -309,10 +310,20 @@ function renderMessage(msg) {
     const distanceToBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
     const shouldAutoscroll = distanceToBottom < 400;
 
-    const { dIndicator, messageElement, sentDate, sentHour, sentMinute } = buildMessageDOM(msg, lastSentDate, lastSentHour, lastSentMinute);
+    const { dIndicator, messageElement, sentDate, sentHour, sentMinute, isImage } = buildMessageDOM(msg, lastSentDate, lastSentHour, lastSentMinute);
     
     if (dIndicator) wrapper.appendChild(dIndicator);
     wrapper.appendChild(messageElement);
+
+    if (isImage) {
+        const img = messageElement.querySelector('.messageText');
+        img.addEventListener('load', () => {
+            const currentDistance = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight;
+            if (currentDistance < 400) {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            }
+        });
+    }
 
     if (!isHistoryLoading && shouldAutoscroll) {
         wrapper.scrollTop = wrapper.scrollHeight;
