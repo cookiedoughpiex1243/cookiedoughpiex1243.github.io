@@ -259,7 +259,7 @@ let newMsgBadge = null;
 function updateNewMsgBadge() {
     if (!newMsgBadge) {
         newMsgBadge = document.createElement('div');
-        newMsgBadge.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#00ffff;color:#0b0c10;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:bold;z-index:1000;box-shadow:0 2px 12px rgba(0,255,255,0.4);';
+        newMsgBadge.style.cssText = 'position:fixed;bottom:80px;right:71px;background:#00ffff;color:#0b0c10;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:bold;z-index:1000;box-shadow:0 2px 12px rgba(0,255,255,0.4);';
         newMsgBadge.addEventListener('click', () => { wrapper.scrollTop = wrapper.scrollHeight; });
         document.body.appendChild(newMsgBadge);
     }
@@ -322,7 +322,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         if (msgRid !== null) {
             replyHTML = `<h6 style="color: ${replyColor || oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="reply-pending" style="color: ${oppositeThemeColor}"><i>Reply: ...</i></h6>`;
+            replyHTML = `<h6 class="reply-pending" style="color: ${oppositeThemeColor}"><i>Reply: Pending...</i></h6>`;
         }
     }
 
