@@ -1,4 +1,4 @@
-const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+const CLOUD_URL = "http://localhost:3000";
 const socket = io(CLOUD_URL);
 
 let clicked = false;
@@ -327,7 +327,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     }
 
     messageElement.innerHTML = `
-        <h4 style="color: ${themeColor}">${displayName}</h4>
+        ${site != "echat" && site != "jchat" ? null : `<h4 style="color: ${themeColor}">${displayName}</h4>`}
         ${replyHTML}
         ${isImage
             ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
@@ -523,6 +523,7 @@ function cleanupDateMarkers() {
 }
 
 async function loadHistory() {
+    const LOAD_LIMIT = 100; // must match server default
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     isHistoryLoading = true;
     hasMoreMessages = true;
@@ -536,17 +537,19 @@ async function loadHistory() {
         const newestMessages = await res.json();
         wrapper.innerHTML = '';
         
-        // Check if lastReadID is within the initial 50 newest messages
+        const batchFull = newestMessages.length >= LOAD_LIMIT;
+
+        // Check if lastReadID is within the loaded batch
         const lastReadInBatch = myLastReadID
             ? newestMessages.some(m => m.id === Number(myLastReadID))
             : true;
         
-        // --- Many-unread case: lastRead is older than the initial 50 ---
-        if (chatType === 'private' && myLastReadID && !lastReadInBatch && newestMessages.length === 50) {
-            // Fetch context (10 msgs ending at lastRead) + unread (50 msgs after lastRead) in parallel
+        // --- Many-unread case: lastRead is older than the initial batch ---
+        if (chatType === 'private' && myLastReadID && !lastReadInBatch && batchFull) {
+            // Fetch context (10 msgs ending at lastRead) + unread (LOAD_LIMIT msgs after lastRead) in parallel
             const [contextRes, unreadRes] = await Promise.all([
                 fetch(`${CLOUD_URL}/${endpoint}?before=${Number(myLastReadID) + 1}&limit=10`),
-                fetch(`${CLOUD_URL}/${endpoint}?after=${myLastReadID}&limit=50`)
+                fetch(`${CLOUD_URL}/${endpoint}?after=${myLastReadID}&limit=${LOAD_LIMIT}`)
             ]);
             const contextMsgs = await contextRes.json();
             const unreadMsgs = await unreadRes.json();
@@ -556,7 +559,6 @@ async function loadHistory() {
             
             if (allInitial.length > 0) {
                 oldestMessageID = allInitial[0].id;
-                // newestLoadedID is updated by renderMessage already
             }
             
             // Top sentinel for loading older context
@@ -587,18 +589,15 @@ async function loadHistory() {
                 }
             }
             const scrollTo = firstUnread || wrapper.lastElementChild;
-            if (scrollTo) {
-                scrollTo.scrollIntoView({ behavior: 'instant', block: 'start' });
-                requestAnimationFrame(() => scrollTo.scrollIntoView({ behavior: 'instant', block: 'start' }));
-            }
+            stableScrollTo(scrollTo, 'start');
             return;
         }
         
-        // --- Normal case: show 50 newest, find first unread ---
+        // --- Normal case: show newest batch, find first unread ---
         if (newestMessages.length > 0) {
             oldestMessageID = newestMessages[0].id;
         }
-        if (newestMessages.length < 50) {
+        if (!batchFull) {
             hasMoreMessages = false;
         }
         
@@ -625,18 +624,7 @@ async function loadHistory() {
             }
         }
 
-        if (scrollTarget) {
-            scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
-        } else {
-            wrapper.scrollTop = wrapper.scrollHeight;
-        }
-        requestAnimationFrame(() => {
-            if (scrollTarget) {
-                scrollTarget.scrollIntoView({ behavior: 'instant', block: 'start' });
-            } else {
-                wrapper.scrollTop = wrapper.scrollHeight;
-            }
-        });
+        stableScrollTo(scrollTarget, 'start');
     } catch (err) {
         console.error("Failed to load history:", err);
     } finally {
@@ -644,23 +632,67 @@ async function loadHistory() {
     }
 }
 
+// Scroll to a target element (or to the bottom if null), and hold the position
+// stable while images are still loading by using a ResizeObserver.
+function stableScrollTo(target, block = 'start') {
+    const doScroll = () => {
+        if (target) {
+            target.scrollIntoView({ behavior: 'instant', block });
+        } else {
+            wrapper.scrollTop = wrapper.scrollHeight;
+        }
+    };
+    doScroll();
+    requestAnimationFrame(doScroll);
+
+    // Watch for layout changes caused by images loading and re-apply scroll
+    let scrollTimer;
+    const ro = new ResizeObserver(() => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            doScroll();
+        }, 16); // one frame debounce
+    });
+    ro.observe(wrapper);
+    // Stop watching after 4 seconds (all images should have loaded by then)
+    setTimeout(() => ro.disconnect(), 4000);
+}
+
 
 
 document.addEventListener('visibilitychange', () => {
-    if(document.hidden){
-    hasFocus = false
-    console.log("unfocused");
-    socket.emit("unfocused", {room:chatType, user: user})}
-    else{
-    console.log("focused")
-    // Get the last rendered message ID to update the server's read cursor
+    if (document.hidden) {
+        hasFocus = false;
+        console.log("unfocused");
+        // Update last-read to the newest visible message before hiding
+        updateLastRead();
+        socket.emit("unfocused", {room: chatType, user: user});
+    } else {
+        console.log("focused");
+        updateLastRead();
+        document.title = defaultTitle;
+        newMsgs = 0;
+        hasFocus = true;
+    }
+});
+
+// Update the server's last-read cursor to the newest rendered message.
+// Only does anything for private chat.
+function updateLastRead() {
+    if (chatType !== 'private') return;
     const allBoxes = wrapper.querySelectorAll('.messageBox');
     const lastBox = allBoxes[allBoxes.length - 1];
     const lastID = lastBox ? Number(lastBox.getAttribute('msg-id')) : null;
-    socket.emit("focused", {room:chatType, user: user, lastID: lastID})
-    document.title = defaultTitle;
-    newMsgs = 0;
-    hasFocus = true;}
+    if (!lastID) return;
+    socket.emit("focused", {room: chatType, user: user, lastID: lastID});
+}
+
+// Also update last-read when the user scrolls to the very bottom (they're reading latest)
+wrapper.addEventListener('scroll', () => {
+    if (!hasNewerMessages) {
+        const atBottom = wrapper.scrollHeight - wrapper.scrollTop - wrapper.clientHeight < 50;
+        if (atBottom) updateLastRead();
+    }
 });
 
 wrapper.addEventListener('contextmenu', (event) => {
