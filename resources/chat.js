@@ -53,10 +53,10 @@ function sendSystemMessage(msg) {
 
 function cancelReply() {
     if(lastReplied != null) {
-    const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
+    //const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
 	
 		Rid = null;
-		lastReplied.style.border = `2px solid ${lastReplySenderColor}`;
+		lastReplied.style.border = `2px solid ${lastReplied.getAttribute("data-sender") === "josh" ? "rgb(0, 255, 255)" : "rgb(255, 0, 255)"}`;
 		lastReplied.style.scale = "1";
 		replyIndicator.style.display = "none";
 	}	
@@ -291,6 +291,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('messageBox');
     messageElement.setAttribute('msg-id', msg.id || Date.now());
+    messageElement.setAttribute('data-sender', senderLower);
     if (msg.Rid) messageElement.setAttribute('data-rid', msg.Rid);
 
     if (isMe) {
@@ -327,7 +328,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     }
 
     messageElement.innerHTML = `
-        ${site != "echat" && site != "jchat" ? null : `<h4 style="color: ${themeColor}">${displayName}</h4>`}
+        ${site === "echat" || site === "jchat" ? '' : `<h4 style="color: ${themeColor}">${displayName}</h4>`}
         ${replyHTML}
         ${isImage
             ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
@@ -699,7 +700,7 @@ wrapper.addEventListener('contextmenu', (event) => {
     event.preventDefault();
     const selected = event.target.closest(".messageBox");
     if (!selected) return;
-	if (selected.querySelector("h4").textContent.toLowerCase() === user) {
+	if (selected.getAttribute("data-sender") === user.toLowerCase()) {
 	const confirmed = window.confirm(`Are you sure you want to delete message: "${selected.querySelector(".messageText").textContent}"`);
 	if (confirmed === true) {
     const ID = selected.getAttribute("msg-id");
