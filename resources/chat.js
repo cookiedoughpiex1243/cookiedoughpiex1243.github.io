@@ -245,6 +245,7 @@ sendbtn.addEventListener('click', sendMessage);
 let isHistoryLoading = false;
 
 // --- Pagination state ---
+const LOAD_LIMIT = 100;        // default limit per REST fetch (must match server)
 let oldestMessageID = null;    // oldest rendered — scroll UP loads before this
 let newestLoadedID = null;     // newest rendered via REST — scroll DOWN loads after this
 let hasMoreMessages = true;    // can we scroll up for more?
@@ -405,13 +406,17 @@ async function fetchMoreMessages() {
     
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
-        const res = await fetch(`${CLOUD_URL}/${endpoint}?before=${oldestMessageID}`);
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?before=${oldestMessageID}&limit=${LOAD_LIMIT}`);
         const messages = await res.json();
         
         if (messages.length === 0) {
             hasMoreMessages = false;
             if (scrollSentinel?.parentNode) scrollSentinel.parentNode.removeChild(scrollSentinel);
             return;
+        }
+        
+        if (messages.length < LOAD_LIMIT) {
+            hasMoreMessages = false;
         }
         
         oldestMessageID = messages[0].id;
@@ -433,7 +438,11 @@ async function fetchMoreMessages() {
         const prevScrollBottom = wrapper.scrollHeight - wrapper.scrollTop;
         wrapper.prepend(fragment);
         wrapper.scrollTop = wrapper.scrollHeight - prevScrollBottom;
-        if (hasMoreMessages) wrapper.prepend(scrollSentinel);
+        if (hasMoreMessages) {
+            wrapper.prepend(scrollSentinel);
+        } else if (scrollSentinel?.parentNode) {
+            scrollSentinel.parentNode.removeChild(scrollSentinel);
+        }
         
         fixupReplies();
         cleanupDateMarkers();
@@ -449,7 +458,7 @@ async function loadNewerMessages() {
     isFetchingMore = true;
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
-        const res = await fetch(`${CLOUD_URL}/${endpoint}?after=${newestLoadedID}`);
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?after=${newestLoadedID}&limit=${LOAD_LIMIT}`);
         const messages = await res.json();
         
         // Remove bottom sentinel before appending
@@ -461,7 +470,7 @@ async function loadNewerMessages() {
         
         if (messages.length > 0) newestLoadedID = messages[messages.length - 1].id;
         
-        if (messages.length < 50) {
+        if (messages.length < LOAD_LIMIT) {
             // Caught up to latest — turn off mid-history mode
             hasNewerMessages = false;
             pendingLiveMsgCount = 0;
@@ -655,8 +664,18 @@ function stableScrollTo(target, block = 'start') {
         }, 16); // one frame debounce
     });
     ro.observe(wrapper);
-    // Stop watching after 4 seconds (all images should have loaded by then)
-    setTimeout(() => ro.disconnect(), 4000);
+
+    // Disconnect RO as soon as user manually scrolls or touches the screen so it doesn't fight manual scroll
+    const cancelRO = () => {
+        ro.disconnect();
+        wrapper.removeEventListener('scroll', cancelRO);
+        wrapper.removeEventListener('touchstart', cancelRO);
+    };
+    wrapper.addEventListener('scroll', cancelRO, { passive: true });
+    wrapper.addEventListener('touchstart', cancelRO, { passive: true });
+
+    // Stop watching after 2.5 seconds
+    setTimeout(cancelRO, 2500);
 }
 
 

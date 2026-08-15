@@ -124,7 +124,6 @@
     padding-bottom: 6em;
     overflow-y: auto;
     box-sizing: border-box;
-    scroll-behavior: smooth;
  }
  .cwrapper::-webkit-scrollbar {
     display: none;
