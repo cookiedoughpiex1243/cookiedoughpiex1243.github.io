@@ -51,15 +51,21 @@ function sendSystemMessage(msg) {
     socket.emit("send_message", msgData);
 }
 
+function getSenderColor(sender) {
+    if (!sender) return "#ff00ff";
+    const s = sender.toLowerCase();
+    if (s === "josh") return "#00ffff";
+    if (s === "system") return "red";
+    return "#ff00ff";
+}
+
 function cancelReply() {
     if(lastReplied != null) {
-    //const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
-	
-		Rid = null;
-		lastReplied.style.border = `2px solid ${lastReplied.getAttribute("data-sender") === "josh" ? "rgb(0, 255, 255)" : "rgb(255, 0, 255)"}`;
-		lastReplied.style.scale = "1";
-		replyIndicator.style.display = "none";
-	}	
+        Rid = null;
+        lastReplied.style.border = `2px solid ${getSenderColor(lastReplied.getAttribute("data-sender"))}`;
+        lastReplied.style.scale = "1";
+        replyIndicator.style.display = "none";
+    }	
 }
 
 function selectReply() {
@@ -273,8 +279,11 @@ function updateNewMsgBadge() {
 }
 
 function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
-    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;
-    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
+    const targetEl = msg.Rid ? document.querySelector(`[msg-id="${msg.Rid}"]`) : null;
+    const msgRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent || null) : null;
+    const targetSender = targetEl ? targetEl.getAttribute('data-sender') : null;
+    const replyColor = targetSender ? getSenderColor(targetSender) : null;
+
     const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
@@ -299,8 +308,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         messageElement.style.marginLeft = "auto";
     }
 
-    let themeColor = isJosh ? "#00ffff" : "#ff00ff";
-    const oppositeThemeColor = isJosh ? "#ea00ff" : "#00ffff";
+    let themeColor = getSenderColor(senderLower);
 
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
@@ -321,10 +329,10 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     // If reply target is in DOM, resolve it now. Otherwise mark as pending.
     let replyHTML = '';
     if (msg.Rid) {
-        if (msgRid !== null) {
-            replyHTML = `<h6 style="color: ${replyColor || oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`;
+        if (msgRid !== null && replyColor !== null) {
+            replyHTML = `<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="reply-pending" style="color: ${oppositeThemeColor}"><i>Reply: Pending...</i></h6>`;
+            replyHTML = `<h6 class="reply-pending"><i>Reply: Pending...</i></h6>`;
         }
     }
 
@@ -360,9 +368,9 @@ function fixupReplies() {
         const target = wrapper.querySelector(`[msg-id="${rid}"]`);
         if (!target) return;
         const targetText = target.querySelector('.messageText')?.textContent;
-        const targetColor = target.querySelector('h4')?.style.color;
-        if (targetText) {
-            h6.style.color = targetColor || '';
+        const targetSender = target.getAttribute('data-sender');
+        if (targetText && targetSender) {
+            h6.style.color = getSenderColor(targetSender);
             h6.innerHTML = `<i>Reply: ${targetText}</i>`;
             h6.classList.remove('reply-pending');
         }
