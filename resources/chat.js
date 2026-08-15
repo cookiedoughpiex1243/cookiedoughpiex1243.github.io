@@ -51,15 +51,21 @@ function sendSystemMessage(msg) {
     socket.emit("send_message", msgData);
 }
 
+function getSenderColor(sender) {
+    if (!sender) return "#ff00ff";
+    const s = sender.toLowerCase();
+    if (s === "josh") return "#00ffff";
+    if (s === "system") return "red";
+    return "#ff00ff";
+}
+
 function cancelReply() {
     if(lastReplied != null) {
-    //const lastReplySenderColor = lastReplied.querySelector("h4").style.color;
-	
-		Rid = null;
-		lastReplied.style.border = `2px solid ${lastReplied.getAttribute("data-sender") === "josh" ? "rgb(0, 255, 255)" : "rgb(255, 0, 255)"}`;
-		lastReplied.style.scale = "1";
-		replyIndicator.style.display = "none";
-	}	
+        Rid = null;
+        lastReplied.style.border = `2px solid ${getSenderColor(lastReplied.getAttribute("data-sender"))}`;
+        lastReplied.style.scale = "1";
+        replyIndicator.style.display = "none";
+    }	
 }
 
 function selectReply() {
@@ -245,6 +251,7 @@ sendbtn.addEventListener('click', sendMessage);
 let isHistoryLoading = false;
 
 // --- Pagination state ---
+const LOAD_LIMIT = 100;        // default limit per REST fetch (must match server)
 let oldestMessageID = null;    // oldest rendered — scroll UP loads before this
 let newestLoadedID = null;     // newest rendered via REST — scroll DOWN loads after this
 let hasMoreMessages = true;    // can we scroll up for more?
@@ -272,8 +279,11 @@ function updateNewMsgBadge() {
 }
 
 function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
-    const msgRid = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('.messageText')?.textContent || null) : null;
-    const replyColor = msg.Rid ? (document.querySelector(`[msg-id="${msg.Rid}"]`)?.querySelector('h4')?.style.color || null) : null;
+    const targetEl = msg.Rid ? document.querySelector(`[msg-id="${msg.Rid}"]`) : null;
+    const msgRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent || null) : null;
+    const targetSender = targetEl ? targetEl.getAttribute('data-sender') : null;
+    const replyColor = targetSender ? getSenderColor(targetSender) : null;
+
     const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
     const senderLower = sender.toLowerCase();
@@ -298,8 +308,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         messageElement.style.marginLeft = "auto";
     }
 
-    let themeColor = isJosh ? "#00ffff" : "#ff00ff";
-    const oppositeThemeColor = isJosh ? "#ea00ff" : "#00ffff";
+    let themeColor = getSenderColor(senderLower);
 
     let displayName = isJosh ? "Josh" : (senderLower === window.user2Name.toLowerCase() ? window.user2Name : "Anonymous");
     if(isSystem) {
@@ -320,10 +329,10 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     // If reply target is in DOM, resolve it now. Otherwise mark as pending.
     let replyHTML = '';
     if (msg.Rid) {
-        if (msgRid !== null) {
-            replyHTML = `<h6 style="color: ${replyColor || oppositeThemeColor}"><i>Reply: ${msgRid}</i></h6>`;
+        if (msgRid !== null && replyColor !== null) {
+            replyHTML = `<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="reply-pending" style="color: ${oppositeThemeColor}"><i>Reply: Pending...</i></h6>`;
+            replyHTML = `<h6 class="reply-pending"><i>Reply: Pending...</i></h6>`;
         }
     }
 
@@ -359,9 +368,9 @@ function fixupReplies() {
         const target = wrapper.querySelector(`[msg-id="${rid}"]`);
         if (!target) return;
         const targetText = target.querySelector('.messageText')?.textContent;
-        const targetColor = target.querySelector('h4')?.style.color;
-        if (targetText) {
-            h6.style.color = targetColor || '';
+        const targetSender = target.getAttribute('data-sender');
+        if (targetText && targetSender) {
+            h6.style.color = getSenderColor(targetSender);
             h6.innerHTML = `<i>Reply: ${targetText}</i>`;
             h6.classList.remove('reply-pending');
         }
@@ -405,13 +414,17 @@ async function fetchMoreMessages() {
     
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
-        const res = await fetch(`${CLOUD_URL}/${endpoint}?before=${oldestMessageID}`);
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?before=${oldestMessageID}&limit=${LOAD_LIMIT}`);
         const messages = await res.json();
         
         if (messages.length === 0) {
             hasMoreMessages = false;
             if (scrollSentinel?.parentNode) scrollSentinel.parentNode.removeChild(scrollSentinel);
             return;
+        }
+        
+        if (messages.length < LOAD_LIMIT) {
+            hasMoreMessages = false;
         }
         
         oldestMessageID = messages[0].id;
@@ -433,7 +446,11 @@ async function fetchMoreMessages() {
         const prevScrollBottom = wrapper.scrollHeight - wrapper.scrollTop;
         wrapper.prepend(fragment);
         wrapper.scrollTop = wrapper.scrollHeight - prevScrollBottom;
-        if (hasMoreMessages) wrapper.prepend(scrollSentinel);
+        if (hasMoreMessages) {
+            wrapper.prepend(scrollSentinel);
+        } else if (scrollSentinel?.parentNode) {
+            scrollSentinel.parentNode.removeChild(scrollSentinel);
+        }
         
         fixupReplies();
         cleanupDateMarkers();
@@ -449,7 +466,7 @@ async function loadNewerMessages() {
     isFetchingMore = true;
     const endpoint = chatType === "private" ? "loadechat" : "loadcdata1";
     try {
-        const res = await fetch(`${CLOUD_URL}/${endpoint}?after=${newestLoadedID}`);
+        const res = await fetch(`${CLOUD_URL}/${endpoint}?after=${newestLoadedID}&limit=${LOAD_LIMIT}`);
         const messages = await res.json();
         
         // Remove bottom sentinel before appending
@@ -461,7 +478,7 @@ async function loadNewerMessages() {
         
         if (messages.length > 0) newestLoadedID = messages[messages.length - 1].id;
         
-        if (messages.length < 50) {
+        if (messages.length < LOAD_LIMIT) {
             // Caught up to latest — turn off mid-history mode
             hasNewerMessages = false;
             pendingLiveMsgCount = 0;
@@ -655,8 +672,18 @@ function stableScrollTo(target, block = 'start') {
         }, 16); // one frame debounce
     });
     ro.observe(wrapper);
-    // Stop watching after 4 seconds (all images should have loaded by then)
-    setTimeout(() => ro.disconnect(), 4000);
+
+    // Disconnect RO as soon as user manually scrolls or touches the screen so it doesn't fight manual scroll
+    const cancelRO = () => {
+        ro.disconnect();
+        wrapper.removeEventListener('scroll', cancelRO);
+        wrapper.removeEventListener('touchstart', cancelRO);
+    };
+    wrapper.addEventListener('scroll', cancelRO, { passive: true });
+    wrapper.addEventListener('touchstart', cancelRO, { passive: true });
+
+    // Stop watching after 2.5 seconds
+    setTimeout(cancelRO, 2500);
 }
 
 
