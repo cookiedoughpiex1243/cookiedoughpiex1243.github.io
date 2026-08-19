@@ -1,3 +1,4 @@
+//Variables :D
 const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const socket = io(CLOUD_URL);
 
@@ -39,6 +40,8 @@ const lastReadPromise = (chatType === 'private')
       })
     : Promise.resolve(); // public chat doesn't use unread scroll
 
+
+//Functions :D
 function sendSystemMessage(msg) {
     const msgData = {
         text: msg,
@@ -200,8 +203,12 @@ const msg = `Hello :D, here's some information:\n
             break;
         case '/clearall':
 		if(user === "josh"){
-        socket.emit("clear_chat", chatType);
-        console.log("chat cleared");
+            if(window.confirm("WAIT STOP YOU SURE??????")){
+                if(window.confirm("Pressing ok will delete all data in file.")){
+                    socket.emit("clear_chat", chatType);
+                    console.log("chat cleared");
+                }
+            }
         }
 		else {
 			sendSystemMessage("Lol no. Only josh gets to do that :)");
@@ -821,7 +828,7 @@ const lightboxImg = document.createElement('img');
 lightboxImg.style.cssText = `
     width: auto !important;
     height: auto !important;
-    /max-width: 95% !important;
+    max-width: 95% !important;
     max-height: 95% !important;
     object-fit: contain !important;
     border-radius: 8px !important;

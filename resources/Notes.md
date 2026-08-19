@@ -12,7 +12,8 @@
 
 
 - To-Do
-Only load ~100 Messages on init.load
+jump to reply on click
+Image enlargement doesnt fit phone screens right.
 Better UI :/
 
 ---------------------------
