@@ -5,6 +5,8 @@ if (loggedIn === lock ) {
   document.body.style = "display: flex";
 }
 else {
+  document.body.style.visibilty = 'hidden';
+  document.body.replaceChildren();
   window.location.replace("login");
 }
                        
