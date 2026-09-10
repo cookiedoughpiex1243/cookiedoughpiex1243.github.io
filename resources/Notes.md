@@ -12,8 +12,8 @@
 
 
 - To-Do
-jump to reply on click
-Image enlargement doesnt fit phone screens right.
+Shift typing indicator to server-side
+add button to return to message after clicking on a reply
 Better UI :/
 
 ---------------------------
