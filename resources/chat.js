@@ -337,9 +337,9 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     let replyHTML = '';
     if (msg.Rid) {
         if (msgRid !== null && replyColor !== null) {
-            replyHTML = `<h6 style="color: ${replyColor}"><i>Reply: ${msgRid}</i></h6>`;
+            replyHTML = `<h6 class="reply-tag" data-rid="${msg.Rid}" style="color: ${replyColor}; cursor: pointer;"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="reply-pending"><i>Reply: Pending...</i></h6>`;
+            replyHTML = `<h6 class="r   eply-tag reply-pending" data-rid="${msg.Rid}" style="cursor: pointer;"><i>Reply: Pending...</i></h6>`;
         }
     }
 
@@ -380,6 +380,9 @@ function fixupReplies() {
             h6.style.color = getSenderColor(targetSender);
             h6.innerHTML = `<i>Reply: ${targetText}</i>`;
             h6.classList.remove('reply-pending');
+            h6.classList.add('reply-tag');
+            h6.setAttribute('data-rid', rid);
+            h6.style.cursor = 'pointer';
         }
     });
 }
@@ -742,13 +745,53 @@ wrapper.addEventListener('contextmenu', (event) => {
 	}
     }
 });
-if (isMobile == false) {
-    wrapper.addEventListener('click', (event) => {
+async function scrollToRepliedMessage(rid) {
+    if (!rid) return;
+    let target = wrapper.querySelector(`.messageBox[msg-id="${rid}"]`);
+    let attempts = 0;
+    while (!target && hasMoreMessages && attempts < 5) {
+        if (oldestMessageID && Number(rid) >= Number(oldestMessageID)) {
+            break;
+        }
+        attempts++;
+        if (isFetchingMore) {
+            await new Promise(r => setTimeout(r, 200));
+        } else {
+            await fetchMoreMessages();
+        }
+        target = wrapper.querySelector(`.messageBox[msg-id="${rid}"]`);
+    }
+
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.style.transition = 'scale 0.3s ease, box-shadow 0.3s ease';
+        target.style.scale = '1.05';
+        target.style.boxShadow = '0 0 15px #00ffff';
+        setTimeout(() => {
+            target.style.scale = '';
+            target.style.boxShadow = '';
+            target.style.transition = '';
+        }, 1000);
+    }
+}
+
+wrapper.addEventListener('click', (event) => {
+    const replyTag = event.target.closest('.reply-tag') || (event.target.closest('h6')?.textContent.trim().startsWith('Reply:') ? event.target.closest('h6') : null);
+    if (replyTag) {
+        event.preventDefault();
+        event.stopPropagation();
+        const rid = replyTag.getAttribute('data-rid') || replyTag.closest('[data-rid]')?.getAttribute('data-rid');
+        if (rid) {
+            scrollToRepliedMessage(rid);
+        }
+        return;
+    }
+    if (!isMobile) {
         clicked = clicked ? clicked : true;
         event.preventDefault();
         selectReply();
-    });
-}
+    }
+});
 //swipey logic
 let swipedBox;
 let initialX = null;
@@ -756,10 +799,11 @@ let initialY = null;
 let finalX = null;
 let finalY = null;
 wrapper.addEventListener("touchstart", function(e) {
+    if (e.target.closest('.reply-tag') || (e.target.closest('h6')?.textContent.trim().startsWith('Reply:'))) return;
     initialX = e.touches[0].clientX;
     initialY = e.touches[0].clientY;
 	swipedBox = e.target.closest(".messageBox");
-	swipedBox.style.scale = "1.05";
+	if (swipedBox) swipedBox.style.scale = "1.05";
 }, false)
 
 wrapper.addEventListener("touchend", function(e) {
@@ -768,7 +812,7 @@ wrapper.addEventListener("touchend", function(e) {
     if((finalX - initialX > 100 || initialX - finalX > 100) && (initialY - finalY < 50 && finalY - initialY < 100)) {
         selectReply();
     }
-	swipedBox.style.scale = "1";
+	if (swipedBox) swipedBox.style.scale = "1";
 })
 
 // --- Image paste support ---
