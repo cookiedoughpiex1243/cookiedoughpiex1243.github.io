@@ -30,6 +30,28 @@
 #typing-indicator {
   left: 10px;
 }
+
+#return-btn {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  background: #1a1a2e;
+  color: #00ffff;
+  border: 1.5px solid #00ffff;
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-size: 0.85rem;
+  font-style: italic;
+  cursor: pointer;
+  z-index: 1001;
+  box-shadow: 0 2px 12px rgba(0,255,255,0.25);
+  transition: opacity 0.2s ease;
+}
+#return-btn:hover {
+  background: rgba(0,255,255,0.12);
+}
  /* Container for the checkbox */
 .custom-checkbox {
   display: flex;
