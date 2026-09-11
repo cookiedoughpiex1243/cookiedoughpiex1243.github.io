@@ -756,6 +756,7 @@ wrapper.addEventListener('contextmenu', (event) => {
 // --- Return-to-message button ---
 let returnBtn = null;
 let returnScrollPos = null;
+let returnTarget = null; // remembers the message we jumped to
 
 function showReturnButton(scrollPos) {
     returnScrollPos = scrollPos;
@@ -796,6 +797,8 @@ async function scrollToRepliedMessage(rid) {
 
     if (target) {
         showReturnButton(scrollBefore);
+// returnTarget is set when the user clicks a reply (original message)
+
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
         target.style.transition = 'scale 0.3s ease, box-shadow 0.3s ease';
         target.style.scale = '1.05';
@@ -813,6 +816,8 @@ wrapper.addEventListener('click', (event) => {
     if (replyTag) {
         event.preventDefault();
         event.stopPropagation();
+        // Store the original message element (the one we clicked on) as the return target
+        returnTarget = replyTag.closest('.messageBox');
         const rid = replyTag.getAttribute('data-rid') || replyTag.closest('[data-rid]')?.getAttribute('data-rid');
         if (rid) {
             scrollToRepliedMessage(rid);
@@ -825,6 +830,17 @@ wrapper.addEventListener('click', (event) => {
         selectReply();
     }
 });
+// Hide button when scrolling past the target (newer messages)
+wrapper.addEventListener('scroll', () => {
+    if (!returnBtn || returnBtn.style.display === 'none' || !returnTarget) return;
+    const scrollPos = wrapper.scrollTop;
+    const targetBottom = returnTarget.offsetTop + returnTarget.offsetHeight;
+    if (scrollPos > targetBottom) {
+        hideReturnButton();
+        returnTarget = null;
+    }
+});
+
 //swipey logic
 let swipedBox;
 let initialX = null;
