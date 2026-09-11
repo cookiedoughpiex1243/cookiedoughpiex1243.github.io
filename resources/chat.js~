@@ -1,5 +1,5 @@
 //Variables :D
-const CLOUD_URL = "localhost:3000";
+const CLOUD_URL = "http://localhost:3000";
 const socket = io(CLOUD_URL);
 
 let clicked = false;

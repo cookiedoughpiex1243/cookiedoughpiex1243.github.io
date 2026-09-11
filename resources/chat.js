@@ -1,5 +1,5 @@
 //Variables :D
-const CLOUD_URL = "http://localhost:3000";
+const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
 const socket = io(CLOUD_URL);
 
 let clicked = false;
