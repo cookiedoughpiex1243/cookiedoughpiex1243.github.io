@@ -873,7 +873,7 @@ messageInput.addEventListener('paste', (event) => {
             event.preventDefault();
             const file = item.getAsFile();
             if (!file) return;
-            if (file.size > 2*(1024 * 1024) {
+            if (file.size > 2*(1024 * 1024)) {
                 alert('Image too large — keep it under 2 MB.');
                 return;
             }
