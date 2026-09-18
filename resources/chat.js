@@ -205,10 +205,17 @@ async function sendMessage() {
         case '/help':
 const msg = `Hello :D, here's some information:\n
 /logout to logout (or just redirect to login page)\n
+/img to upload an image\n
 /help for this message :D`
-            sendSystemMessage(msg)
+            sendSystemMessage(msg);
+            stopTyping();
             messageInput.value = '';
             break;
+        case '/img':
+            stopTyping();
+            messageInput.value = '';
+            triggerImageUpload();
+            return;
         case '/clearall':
 		if(user === "josh"){
             if(window.confirm("WAIT STOP YOU SURE??????")){
@@ -864,7 +871,90 @@ wrapper.addEventListener("touchend", function(e) {
 	if (swipedBox) swipedBox.style.scale = "1";
 })
 
-// --- Image paste support ---
+// --- Image upload helper, file input & paste support ---
+function setUploadingIndicator(isUploading) {
+    if (isUploading) {
+        const base = messageInput.placeholder.replace(" (Image uploading...)", "");
+        messageInput.placeholder = base + " (Image uploading...)";
+    } else {
+        messageInput.placeholder = messageInput.placeholder.replace(" (Image uploading...)", "");
+    }
+}
+
+function handleImageFile(file) {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Image too large — keep it under 5 MB.');
+        return;
+    }
+    if (!socket.connected) {
+        alert('Not connected to server. Please try again.');
+        return;
+    }
+    setUploadingIndicator(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+        let finished = false;
+        const timeoutId = setTimeout(() => {
+            if (!finished) {
+                finished = true;
+                setUploadingIndicator(false);
+                console.warn("Image upload timed out waiting for server ACK");
+            }
+        }, 15000);
+
+        try {
+            socket.emit('send_message', {
+                room: chatType,
+                text: reader.result,   // base64 data URL
+                sender: user,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                id: Date.now(),
+                Rid: Rid ?? null,
+            }, (response) => {
+                if (!finished) {
+                    finished = true;
+                    clearTimeout(timeoutId);
+                    setUploadingIndicator(false);
+                    cancelReply();
+                    if (replyIndicator) replyIndicator.style.display = 'none';
+                }
+            });
+        } catch (err) {
+            console.error("Error sending image:", err);
+            if (!finished) {
+                finished = true;
+                clearTimeout(timeoutId);
+                setUploadingIndicator(false);
+                alert("Failed to send image.");
+            }
+        }
+    };
+    reader.onerror = () => {
+        alert('Failed to read image file.');
+        setUploadingIndicator(false);
+    };
+    reader.readAsDataURL(file);
+}
+
+const imageFileInput = document.createElement('input');
+imageFileInput.type = 'file';
+imageFileInput.accept = 'image/*';
+imageFileInput.style.display = 'none';
+document.body.appendChild(imageFileInput);
+
+function triggerImageUpload() {
+    imageFileInput.value = '';
+    imageFileInput.click();
+}
+
+imageFileInput.addEventListener('change', (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+        handleImageFile(file);
+    }
+});
+
 messageInput.addEventListener('paste', (event) => {
     const items = event.clipboardData?.items;
     if (!items) return;
@@ -872,25 +962,9 @@ messageInput.addEventListener('paste', (event) => {
         if (item.type.startsWith('image/')) {
             event.preventDefault();
             const file = item.getAsFile();
-            if (!file) return;
-            if (file.size > 2*(1024 * 1024)) {
-                alert('Image too large — keep it under 2 MB.');
-                return;
+            if (file) {
+                handleImageFile(file);
             }
-            const reader = new FileReader();
-            reader.onload = () => {
-                socket.emit('send_message', {
-                    room: chatType,
-                    text: reader.result,   // base64 data URL
-                    sender: user,
-                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    id: Date.now(),
-                    Rid: Rid ?? null,
-                });
-                cancelReply();
-                replyIndicator.style.display = 'none';
-            };
-            reader.readAsDataURL(file);
             break;
         }
     }
