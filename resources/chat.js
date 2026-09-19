@@ -1,5 +1,5 @@
 //Variables :D
-const CLOUD_URL = "https://josh-backend-om8q.onrender.com";
+const CLOUD_URL = "http://localhost:3000";
 const socket = io(CLOUD_URL);
 
 let clicked = false;
@@ -364,7 +364,11 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     messageElement.style.border = `2px solid ${themeColor}`;
     const sentHour = parseInt(msg.timestamp.split(":")[0]);
     const sentMinute = parseInt(msg.timestamp.split(":")[1]);
-    const isImage = typeof msg.text === 'string' && msg.text.startsWith('data:image/');
+    const isImage = typeof msg.text === 'string' && (
+        msg.text.startsWith('data:image/') ||
+        msg.text.includes('ik.imagekit.io') ||
+        /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(msg.text)
+    );
     if (sentHour !== prevHour || sentMinute - prevMinute > 5) {
         messageElement.style.marginTop = "5em";
     }
@@ -905,60 +909,43 @@ function setUploadingIndicator(isUploading) {
     }
 }
 
-function handleImageFile(file) {
+async function handleImageFile(file) {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-        alert('Image too large — keep it under 5 MB.');
-        return;
-    }
-    if (!socket.connected) {
-        alert('Not connected to server. Please try again.');
+    if (file.size > 25 * 1024 * 1024) {
+        alert('File too large — keep it under 25 MB.');
         return;
     }
     setUploadingIndicator(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-        let finished = false;
-        const timeoutId = setTimeout(() => {
-            if (!finished) {
-                finished = true;
-                setUploadingIndicator(false);
-                console.warn("Image upload timed out waiting for server ACK");
-            }
-        }, 15000);
+    try {
+        const formData = new FormData();
+        formData.append('media', file);
 
-        try {
+        const res = await fetch(`${CLOUD_URL}/api/upload`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        if (data.success && data.url) {
             socket.emit('send_message', {
                 room: chatType,
-                text: reader.result,   // base64 data URL
+                text: data.url,
                 sender: user,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 id: Date.now(),
                 Rid: Rid ?? null,
-            }, (response) => {
-                if (!finished) {
-                    finished = true;
-                    clearTimeout(timeoutId);
-                    setUploadingIndicator(false);
-                    cancelReply();
-                    if (replyIndicator) replyIndicator.style.display = 'none';
-                }
             });
-        } catch (err) {
-            console.error("Error sending image:", err);
-            if (!finished) {
-                finished = true;
-                clearTimeout(timeoutId);
-                setUploadingIndicator(false);
-                alert("Failed to send image.");
-            }
+            cancelReply();
+            if (replyIndicator) replyIndicator.style.display = 'none';
+        } else {
+            alert('Upload failed: ' + (data.error || 'Server error'));
         }
-    };
-    reader.onerror = () => {
-        alert('Failed to read image file.');
+    } catch (err) {
+        console.error("ImageKit upload error:", err);
+        alert("Error uploading media to server.");
+    } finally {
         setUploadingIndicator(false);
-    };
-    reader.readAsDataURL(file);
+    }
 }
 
 const imageFileInput = document.createElement('input');
