@@ -300,6 +300,27 @@ function updateNewMsgBadge() {
     }
 }
 
+function formatMessageText(text) {
+    if (!text) return "";
+    const escaped = String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    const urlRegex = /(https:\/\/[^\s<]+)/gi;
+    return escaped.replace(urlRegex, (url) => {
+        let cleanUrl = url;
+        let trailingPunct = "";
+        while (/[.,;:!?)]$/.test(cleanUrl)) {
+            trailingPunct = cleanUrl.slice(-1) + trailingPunct;
+            cleanUrl = cleanUrl.slice(0, -1);
+        }
+        return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" style="color: #00ffff; text-decoration: underline; word-break: break-all;">${cleanUrl}</a>${trailingPunct}`;
+    });
+}
+
 function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const targetEl = msg.Rid ? document.querySelector(`[msg-id="${msg.Rid}"]`) : null;
     const msgRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent || null) : null;
@@ -368,7 +389,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
     if (!isImage) {
-        messageElement.querySelector('.messageText').textContent = msg.text || "";
+        messageElement.querySelector('.messageText').innerHTML = formatMessageText(msg.text || "");
     } else {
         const img = messageElement.querySelector('.messageText');
         img.addEventListener('click', (e) => {
@@ -819,6 +840,9 @@ async function scrollToRepliedMessage(rid) {
 }
 
 wrapper.addEventListener('click', (event) => {
+    if (event.target.closest('a')) {
+        return;
+    }
     const replyTag = event.target.closest('.reply-tag') || (event.target.closest('h6')?.textContent.trim().startsWith('Reply:') ? event.target.closest('h6') : null);
     if (replyTag) {
         event.preventDefault();
@@ -855,7 +879,7 @@ let initialY = null;
 let finalX = null;
 let finalY = null;
 wrapper.addEventListener("touchstart", function(e) {
-    if (e.target.closest('.reply-tag') || (e.target.closest('h6')?.textContent.trim().startsWith('Reply:'))) return;
+    if (e.target.closest('.reply-tag') || (e.target.closest('h6')?.textContent.trim().startsWith('Reply:')) || e.target.closest('a')) return;
     initialX = e.touches[0].clientX;
     initialY = e.touches[0].clientY;
 	swipedBox = e.target.closest(".messageBox");
