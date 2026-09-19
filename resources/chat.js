@@ -323,7 +323,11 @@ function formatMessageText(text) {
 
 function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const targetEl = msg.Rid ? document.querySelector(`[msg-id="${msg.Rid}"]`) : null;
-    const msgRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent || null) : null;
+    // For media messages textContent is empty — fall back to the src attribute so the reply
+    // is treated as "resolved" (in DOM) rather than "pending".
+    const targetMediaEl = targetEl ? targetEl.querySelector('.messageText[src]') : null;
+    const rawRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent.trim() || null) : null;
+    const msgRid = rawRid || (targetMediaEl ? '📷 Media' : null);
     const targetSender = targetEl ? targetEl.getAttribute('data-sender') : null;
     const replyColor = targetSender ? getSenderColor(targetSender) : "yellow";
 
@@ -382,7 +386,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         if (msgRid !== null && replyColor !== null) {
             replyHTML = `<h6 class="reply-tag" data-rid="${msg.Rid}" style="color: ${replyColor}; cursor: pointer;"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="r   eply-tag reply-pending" data-rid="${msg.Rid}" style="cursor: pointer;"><i>Click to view media/message</i></h6>`;
+            replyHTML = `<h6 class="reply-tag reply-pending" data-rid="${msg.Rid}" style="color: yellow; cursor: pointer;"><i>Click to view media/message</i></h6>`;
         }
     }
 
@@ -419,7 +423,8 @@ function fixupReplies() {
         const rid = box.getAttribute('data-rid');
         const target = wrapper.querySelector(`[msg-id="${rid}"]`);
         if (!target) return;
-        const targetText = target.querySelector('.messageText')?.textContent;
+        const targetMediaEl = target.querySelector('.messageText[src]');
+        const targetText = target.querySelector('.messageText')?.textContent.trim() || (targetMediaEl ? '📷 Media' : null);
         const targetSender = target.getAttribute('data-sender');
         if (targetText && targetSender) {
             h6.style.color = getSenderColor(targetSender);
