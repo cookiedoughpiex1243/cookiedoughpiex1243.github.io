@@ -325,7 +325,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     const targetEl = msg.Rid ? document.querySelector(`[msg-id="${msg.Rid}"]`) : null;
     const msgRid = targetEl ? (targetEl.querySelector('.messageText')?.textContent || null) : null;
     const targetSender = targetEl ? targetEl.getAttribute('data-sender') : null;
-    const replyColor = targetSender ? getSenderColor(targetSender) : null;
+    const replyColor = targetSender ? getSenderColor(targetSender) : "yellow";
 
     const sentDate = new Date(msg.id).toString().split(" ").slice(0, 4).join(" ");
     const sender = msg.sender || "anonymous";
