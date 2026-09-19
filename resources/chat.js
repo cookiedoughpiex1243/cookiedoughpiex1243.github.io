@@ -364,7 +364,10 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     messageElement.style.border = `2px solid ${themeColor}`;
     const sentHour = parseInt(msg.timestamp.split(":")[0]);
     const sentMinute = parseInt(msg.timestamp.split(":")[1]);
-    const isImage = typeof msg.text === 'string' && (
+    const isVideo = typeof msg.text === 'string' && (
+        /\.(mp4|webm|mov|avi|mkv|ogv)(\?.*)?$/i.test(msg.text)
+    );
+    const isImage = !isVideo && typeof msg.text === 'string' && (
         msg.text.startsWith('data:image/') ||
         msg.text.includes('ik.imagekit.io') ||
         /\.(png|jpe?g|webp|gif|svg)(\?.*)?$/i.test(msg.text)
@@ -386,15 +389,17 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
     messageElement.innerHTML = `
         ${site === "echat" || site === "jchat" ? '' : `<h4 style="color: ${themeColor}">${displayName}</h4>`}
         ${replyHTML}
-        ${isImage
-            ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
-            : `<p class="messageText"></p>`
+        ${isVideo
+            ? `<video class="messageText" controls style="max-width:260px;max-height:340px;border-radius:8px;margin-top:4px;display:block;" src="${msg.text}"></video>`
+            : isImage
+                ? `<img class="messageText" loading="lazy" src="${msg.text}" style="width: 100% !important; height: auto !important; max-width: 260px !important; max-height: 340px !important; border-radius: 8px !important; margin-top: 4px !important; display: block !important; object-fit: contain !important; cursor: zoom-in !important; transition: transform 0.2s ease !important; box-shadow: none !important;">`
+                : `<p class="messageText"></p>`
         }
         <h6 class="timestamp">${msg.timestamp || ""}</h6>
     `;
-    if (!isImage) {
+    if (!isImage && !isVideo) {
         messageElement.querySelector('.messageText').innerHTML = formatMessageText(msg.text || "");
-    } else {
+    } else if (isImage) {
         const img = messageElement.querySelector('.messageText');
         img.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -899,20 +904,23 @@ wrapper.addEventListener("touchend", function(e) {
 	if (swipedBox) swipedBox.style.scale = "1";
 })
 
-// --- Image upload helper, file input & paste support ---
+// --- Image/video upload helper, file input & paste support ---
 function setUploadingIndicator(isUploading) {
     if (isUploading) {
-        const base = messageInput.placeholder.replace(" (Image uploading...)", "");
-        messageInput.placeholder = base + " (Image uploading...)";
+        const base = messageInput.placeholder.replace(" (Media uploading...)", "");
+        messageInput.placeholder = base + " (Media uploading...)";
     } else {
-        messageInput.placeholder = messageInput.placeholder.replace(" (Image uploading...)", "");
+        messageInput.placeholder = messageInput.placeholder.replace(" (Media uploading...)", "");
     }
 }
 
 async function handleImageFile(file) {
     if (!file) return;
-    if (file.size > 25 * 1024 * 1024) {
-        alert('File too large — keep it under 25 MB.');
+    const isVideoFile = file.type.startsWith('video/');
+    const limit = isVideoFile ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
+    const limitLabel = isVideoFile ? '100 MB' : '25 MB';
+    if (file.size > limit) {
+        alert(`File too large — keep it under ${limitLabel}.`);
         return;
     }
     setUploadingIndicator(true);
@@ -950,7 +958,7 @@ async function handleImageFile(file) {
 
 const imageFileInput = document.createElement('input');
 imageFileInput.type = 'file';
-imageFileInput.accept = 'image/*';
+imageFileInput.accept = 'image/*,video/*';
 imageFileInput.style.display = 'none';
 document.body.appendChild(imageFileInput);
 
