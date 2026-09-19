@@ -382,7 +382,7 @@ function buildMessageDOM(msg, prevDate, prevHour, prevMinute) {
         if (msgRid !== null && replyColor !== null) {
             replyHTML = `<h6 class="reply-tag" data-rid="${msg.Rid}" style="color: ${replyColor}; cursor: pointer;"><i>Reply: ${msgRid}</i></h6>`;
         } else {
-            replyHTML = `<h6 class="r   eply-tag reply-pending" data-rid="${msg.Rid}" style="cursor: pointer;"><i>Reply: Pending...</i></h6>`;
+            replyHTML = `<h6 class="r   eply-tag reply-pending" data-rid="${msg.Rid}" style="cursor: pointer;"><i>Click to view media/message</i></h6>`;
         }
     }
 
