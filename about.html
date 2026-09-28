@@ -3,11 +3,7 @@
 <head>
 <script>window.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;</script>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    .download-btn {
-      width:100%;
-    }
-  </style>
+
   <meta charset="UTF-8">
   <meta name="google-site-verification" content="jk_9WisBo49V68xskUH_imYNf6GRJnX9W-gaO7_LQsQ" />
   <meta name="description" content="Josh's site for remote access, saved notes and more to come (Work in progress). This site may also be know as Joshx1243's site or cookiedoughpie's site.">
@@ -16,25 +12,14 @@
     sessionStorage.setItem("site", "index");
     sessionStorage.setItem("locked", "false");
   </script>
+  <script type="module" src="resources/aboutpage.js"></script>
   <link rel="stylesheet" href="resources/style.css">
     <link rel="icon" href="resources/Cookie pfp 2.png">
 </head>
 <body>
-  <img src="resources/Cookie pfp 2.png" alt="logo" class="logo" onclick="openBox()" style="cursor: pointer;">
+  <img src="resources/Cookie pfp 2.png" alt="logo" id="logo" class="logo" onclick="openBox()" style="cursor: pointer;">
   <div class="wrapper">
-    <h1 style="color: #00ffff;">Josh's site</h1>
-    <img src="resources/Cookie pfp 2.png" alt="Cookie" class="bigpfp">
-
-    <div class="links-block">
-      <a href="Autoconnect" class="download-btn">
-        Connect to my PC remotely
-      </a>
-        <a href="pchat" class="download-btn" style="background:black; color:#00ffff; border:2px solid #00ffff;">Chat</a>
-      
-      <a href="login" class="download-btn" style="background-color:#000; color:#39ff14; border: 2px solid #39ff14">Login</a>
-      <a href="about" class="download-btn" style="background-color:#000; color:#39ff14; border: 2px solid #39ff14">About</a>
-
-    </div>
+    <button id="rotateButton" class="download-btn">Spin!</button>
   </div>
   
   <script src="resources/logobox.js" defer></script>
