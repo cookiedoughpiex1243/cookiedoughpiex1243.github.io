@@ -1,7 +1,7 @@
 import { animate, createTimeline, stagger, createDraggable, spring } from 'https://esm.sh/animejs';
 const logo = document.querySelector('#logo') || null;
 let rotations = 0;
-
+if(logo){
 animate(logo, {
   scale: [
     { to: 1.25, ease: 'inOut(3)', duration: 200 },
@@ -15,7 +15,7 @@ animate(logo, {
 createDraggable(logo, {
   container: [0, 0, 0, 0],
   releaseEase: spring({ bounce: .9, stiffness: 0.0})
-});
+});}
 const randomArray = [
   "Joshx1243",
   "cookiedoughpie",

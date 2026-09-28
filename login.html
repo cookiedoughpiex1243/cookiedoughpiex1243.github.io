@@ -7,7 +7,7 @@
   <script>
     const user = sessionStorage.getItem('loggedIn') || localStorage.getItem('loggedIn');
 
-if (user === "josh" || user === window.user2Name.toLowerCase()) {
+if (user === "josh" || user === window.user2LowerName) {
     const target = (user === "josh") ? "loggedin" : "echat";
     window.location.replace(target);
 }
@@ -16,11 +16,13 @@ if (user === "josh" || user === window.user2Name.toLowerCase()) {
       });
   </script>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" 
+<meta http-equiv="Content-Security-Policy" 
       content="default-src 'self'; 
-               script-src 'self' 'unsafe-inline'; 
+               script-src 'self' 'unsafe-inline' https://esm.sh; 
                style-src 'self' 'unsafe-inline'; 
-               font-src 'self' https://r2cdn.perplexity.ai;">
+               font-src 'self' https://r2cdn.perplexity.ai; 
+               connect-src 'self' https://esm.sh http://localhost:* ws://localhost:*; 
+               img-src 'self' data: blob: https://ik.imagekit.io https://res.cloudinary.com;">
   <title>Login</title>
   <link rel="stylesheet" href="resources/style.css">
     <link rel="icon" href="resources/Cookie pfp 2.png">
