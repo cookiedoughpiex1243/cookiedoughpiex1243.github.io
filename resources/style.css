@@ -306,6 +306,7 @@ margin-bottom: 0px;
       border: 1px solid #24a80d;
       left: auto;
       font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .download-btn.secondary {
@@ -315,8 +316,8 @@ margin-bottom: 0px;
     }
 
     .download-btn:hover {
-      filter: brightness(0.8);
-      transform: scale(1.05);
+      filter: brightness(1.1);
+      box-shadow: 0 4px 15px rgba(57, 255, 20, 0.4);
     }
 
     .links-block {
@@ -363,22 +364,22 @@ margin-bottom: 0px;
       width:300px;
       padding:20px;
       text-align:center;
-      border:2px solid #00ffff;
-      border-radius:12px;
-      animation: fadeInScale 0.3s ease-out forwards;
-      min-width: 0px;
-    }
+    border:2px solid #00ffff;
+    border-radius:12px;
+    animation: fadeInScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    min-width: 0px;
+  }
 
-    .box1 {
-      background: #0b0c10;
-      width:300px;
-      padding:20px;
-      text-align:center;
-      border:2px solid #00ffff;
-      border-radius:12px;
-      animation: fadeInScale1 0.3s ease-out forwards;
-      min-width: 0px;
-    }
+  .box1 {
+    background: #0b0c10;
+    width:300px;
+    padding:20px;
+    text-align:center;
+    border:2px solid #00ffff;
+    border-radius:12px;
+    animation: fadeInScale1 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    min-width: 0px;
+  }
     .closebtn {
       color: #ff4444;
       float: right;
@@ -386,27 +387,27 @@ margin-bottom: 0px;
       font-weight:bold;
       cursor:pointer;
     }
-    @keyframes fadeInScale1 {
-      from {
-        opacity: 0;
-        transform: scale(0.8);
-      }
-          to {
-        opacity: 1;
-        transform: scale(1);
-      }
+@keyframes fadeInScale1 {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
     }
+        to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-    @keyframes fadeInScale {
-      from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.8);
-      }
-          to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-      }
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -40%) scale(0.9);
     }
+        to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
 
       .backbuttonc {
     z-index: 1001;
