@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>window.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0; </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Anonymous</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="resources/chat.js" defer></script>
+    <script src="resources/loggedin.js" defer></script>
+    <script>
+        sessionStorage.setItem("user", "josh");
+        sessionStorage.setItem("site", "schat");
+        sessionStorage.setItem("locked", "josh");
+    </script>
+    <link rel="icon" type="image/x-icon" href="/assets/Cookie%20pfp%202-BENeusoS.png">
+  <script type="module" crossorigin src="/assets/schat-BY5WQaDZ.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/style-ivFLU2tp.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-3BeE2m1b.css">
+</head>
+<body class="chatsite">
+    <div class="cwrapper">
+        <div class="messageBox" style="border:2px solid red; margin-left: auto;margin-right: auto;align-items: center;">
+            <h4 style="color:red; margin-left: auto;margin-right: auto;align-items: center;">System</h4>
+	    Loading Messages...
+        </div> 
+    </div>  
+     <div class="inputbox">
+        <div id="typing-indicator"><b>Josh&nbsp;</b>is typing...</div>
+        <div id="replying-indicator"> You are <b>&nbsp;replying..</b></div>
+        <textarea id="userMsg2" class="login-input" placeholder="Type a message..."></textarea>
+        <button class="download-btn" id="sendbtn">Send</button>
+    </div>
+
+</body>
+</html>

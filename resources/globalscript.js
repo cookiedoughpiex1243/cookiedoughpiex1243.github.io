@@ -27,3 +27,30 @@ const randomArray = [
 
 window.user2Name = randomArray[26];
 window.user2LowerName = window.user2Name.toLowerCase();
+
+// Button hover tilt effect for non-chat pages
+const site = sessionStorage.getItem("site");
+const isChatSite = ["pchat", "jchat", "echat", "schat"].includes(site);
+
+if (!isChatSite) {
+    const buttons = document.querySelectorAll('.download-btn, .back-button');
+    buttons.forEach(btn => {
+        btn.style.transition = 'transform 0.1s ease, box-shadow 0.1s ease';
+        btn.addEventListener('mousemove', (e) => {
+            const rect = btn.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            
+            const rotateX = (y / (rect.height / 2)) * -12; 
+            const rotateY = (x / (rect.width / 2)) * 12;
+            
+            btn.style.transform = `perspective(800px) scale(1.05) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            btn.style.boxShadow = `${-rotateY * 0.5}px ${rotateX * 0.5}px 15px rgba(0,255,255,0.4)`;
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = 'perspective(800px) scale(1) rotateX(0) rotateY(0)';
+            btn.style.boxShadow = '';
+        });
+    });
+}

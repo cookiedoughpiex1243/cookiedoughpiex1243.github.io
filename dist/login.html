@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>window.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0; </script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="resources/login.js" defer></script>
+  <script>
+    const user = sessionStorage.getItem('loggedIn') || localStorage.getItem('loggedIn');
+
+if (user === "josh" || user === window.user2LowerName) {
+    const target = (user === "josh") ? "loggedin" : "echat";
+    window.location.replace(target);
+}
+      document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("username").focus(); 
+      });
+  </script>
+  <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               script-src 'self' 'unsafe-inline' https://esm.sh; 
+               style-src 'self' 'unsafe-inline'; 
+               font-src 'self' https://r2cdn.perplexity.ai; 
+               connect-src 'self' https://esm.sh http://localhost:* ws://localhost:*; 
+               img-src 'self' data: blob: https://ik.imagekit.io https://res.cloudinary.com;">
+  <title>Login</title>
+    <link rel="icon" href="/assets/Cookie%20pfp%202-BENeusoS.png">
+  <script type="module" crossorigin src="/assets/login-BY5WQaDZ.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/style-ivFLU2tp.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-3BeE2m1b.css">
+</head>
+<body>
+  <div class="boxoverlay" style="display: block;">
+    <div class="box">
+      <h2 class="glow-cyan">Login</h2>
+      <div style="text-align:center; margin-top:15px;">
+        <label style="color: #00ffff; display: block; margin-bottom: 5px;">Username</label>
+        <input type="text" id="username" class="login-input" placeholder="Enter Username">
+
+        <label style="color: #00ffff; display: block; margin-top: 15px; margin-bottom: 5px;">Password</label>
+        <input type="password" id="password" class="login-input" placeholder="Enter Password">
+      </div>
+      <label class="custom-checkbox">
+        <input type="checkbox" id="rememberMe"><span class="checkmark"></span>Remember Me
+        </label>
+      <button class="download-btn" id="loginbtn" style="width: 80%; margin-top: 20px;">
+        Login
+      </button>
+      <p id="message" style="margin-top:10px; min-height: 1.2em;"></p>
+    </div>
+  </div>
+<div class="backbuttonc" style="z-index: 1001;">
+  <a href="index" class="back-button">Back</a>
+</div>
+</body>
+</html>

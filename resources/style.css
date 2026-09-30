@@ -256,6 +256,8 @@ margin-bottom: 0px;
     
     .wrapper {
       text-align: center;
+      position: relative;
+      z-index: 10;
     }
     h1 {
       font-size: 3rem;
@@ -341,6 +343,7 @@ margin-bottom: 0px;
       height: 60px;
       border: 2px solid cyan;
       border-radius: 40px;
+      z-index: 10;
     }
     .boxoverlay {
       top:0;
