@@ -1,259 +1,202 @@
-import gsap from 'https://esm.sh/gsap';
+// GSAP is only used for the optional click ripple. It is loaded lazily so that
+// a blocked/slow CDN can never prevent the core tilt effect from working.
+let gsapPromise = null;
+const loadGsap = () => (gsapPromise ??= import('https://esm.sh/gsap').then(m => m.default || m).catch(() => null));
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function initCubes(containerEl, options = {}) {
-  // Prevent duplicate listeners on resize recalculations
-  if (containerEl._cubesAbort) {
-    containerEl._cubesAbort.abort();
-  }
-  const abortCtrl = new AbortController();
-  containerEl._cubesAbort = abortCtrl;
-  const { signal } = abortCtrl;
+  if (containerEl._cubesAbort) containerEl._cubesAbort.abort();
+  const abort = new AbortController();
+  containerEl._cubesAbort = abort;
+  const { signal } = abort;
 
-  // We explicitly use cubeSize to calculate EXACT columns and rows.
-  // This solves ALL coordinate mismatch / off-centering issues.
-  const cubeSize = options.cubeSize || 60;
-  const cols = Math.ceil(window.innerWidth / cubeSize);
-  const rows = Math.ceil(window.innerHeight / cubeSize);
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const lowPower = (navigator.hardwareConcurrency || 4) <= 4;
 
-  const radius = options.radius || 2.5; 
-  const maxAngle = options.maxAngle || 45;
+  // Fewer, larger cubes on weak hardware.
+  let cubeSize = options.cubeSize || (isMobile ? (lowPower ? 88 : 68) : (lowPower ? 84 : 66));
+  let cols = Math.ceil(window.innerWidth / cubeSize);
+  let rows = Math.ceil(window.innerHeight / cubeSize);
+  const half = cubeSize / 2;
+
+  const maxAngle = options.maxAngle ?? 45;
   const borderStyle = options.borderStyle || '1px solid #00ffff';
   const faceColor = options.faceColor || '#0b1318';
   const rippleColor = options.rippleColor || '#00ffff';
   const rippleSpeed = options.rippleSpeed || 2;
-  const autoAnimate = options.autoAnimate !== false;
+  const autoAnimate = options.autoAnimate !== false && !reduceMotion;
   const rippleOnClick = options.rippleOnClick !== false;
+  const radius = options.radius ?? (isMobile ? 2 : 2.5);
 
-  const styleId = 'cubes-vanilla-style';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    document.head.appendChild(style);
+  const styleId = 'cubes-style';
+  let st = document.getElementById(styleId);
+  if (!st) {
+    st = document.createElement('style');
+    st.id = styleId;
+    document.head.appendChild(st);
   }
-  
-  const halfSize = cubeSize / 2;
-  
-  document.getElementById(styleId).innerHTML = `
-    .cubes-wrapper {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      overflow: hidden;
-      z-index: -10; /* Heavily forced to background layer */
-      pointer-events: none; /* Never intercept clicks meant for index buttons! */
-      background: ${faceColor};
-      --cube-face-border: ${borderStyle};
-      --cube-face-bg: ${faceColor};
-    }
-    .cubes-scene-center {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: ${cols * cubeSize}px;
-      height: ${rows * cubeSize}px;
-      perspective: 999999px;
-    }
-    .cubes-scene {
-      display: grid;
-      width: 100%;
-      height: 100%;
-      grid-template-columns: repeat(${cols}, 1fr);
-      grid-template-rows: repeat(${rows}, 1fr);
-      gap: 0;
-    }
-    .cube-item {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transform-style: preserve-3d;
-    }
-    .cube-face-el {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--cube-face-bg);
-      border: var(--cube-face-border);
-      box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
-      box-sizing: border-box;
-    }
-    /* Fixed 3D geometry based on exact pixel variables to prevent gap layout breaks */
-    .cube-face-el.top { transform: rotateX(90deg) translateZ(${halfSize}px); }
-    .cube-face-el.bottom { transform: rotateX(-90deg) translateZ(${halfSize}px); }
-    .cube-face-el.left { transform: rotateY(-90deg) translateZ(${halfSize}px); }
-    .cube-face-el.right { transform: rotateY(90deg) translateZ(${halfSize}px); }
-    .cube-face-el.front { transform: rotateY(0deg) translateZ(${halfSize}px); }
-    .cube-face-el.back { transform: rotateY(180deg) translateZ(${halfSize}px); }
+  st.textContent = `
+    .cubes-wrapper{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;
+      z-index:-10;pointer-events:none;background:${faceColor};}
+    .cubes-scene{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:${cols * cubeSize}px;height:${rows * cubeSize}px;perspective:1200px;}
+    .cubes-grid{display:grid;width:100%;height:100%;
+      grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr);}
+    .cube{position:relative;transform-style:preserve-3d;will-change:transform;
+      backface-visibility:hidden;background-color:${faceColor};
+      border:${borderStyle};box-sizing:border-box;
+      box-shadow:inset 0 0 10px rgba(0,255,255,.10);}
+    .cube::before,.cube::after{content:'';position:absolute;inset:0;background-color:inherit;
+      border:${borderStyle};box-sizing:border-box;backface-visibility:hidden;}
+    .cube::before{transform:rotateX(90deg) translateZ(${half}px);}
+    .cube::after{transform:rotateY(90deg) translateZ(${half}px);}
   `;
 
-  containerEl.innerHTML = '';
-  const wrapper = document.createElement('div');
-  wrapper.className = 'cubes-wrapper';
-  
-  const sceneCenter = document.createElement('div');
-  sceneCenter.className = 'cubes-scene-center';
-
+  containerEl.textContent = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'cubes-wrapper';
   const scene = document.createElement('div');
   scene.className = 'cubes-scene';
-  
-  sceneCenter.appendChild(scene);
-  wrapper.appendChild(sceneCenter);
-  containerEl.appendChild(wrapper);
+  const grid = document.createElement('div');
+  grid.className = 'cubes-grid';
+  scene.appendChild(grid);
+  wrap.appendChild(scene);
+  containerEl.appendChild(wrap);
 
   const cubes = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const cube = document.createElement('div');
-      cube.className = 'cube-item';
-      cube.dataset.row = r;
-      cube.dataset.col = c;
-
-      ['top', 'bottom', 'left', 'right', 'front', 'back'].forEach(faceName => {
-        const face = document.createElement('div');
-        face.className = `cube-face-el ${faceName}`;
-        cube.appendChild(face);
-      });
-
-      scene.appendChild(cube);
-      cubes.push(cube);
+      const el = document.createElement('div');
+      el.className = 'cube';
+      el.dataset.row = r;
+      el.dataset.col = c;
+      grid.appendChild(el);
+      cubes.push(el);
     }
   }
 
-  let userActive = false;
-  let idleTimer = null;
-  let rafId = null;
+  const n = cubes.length;
+  const curX = new Float32Array(n), curY = new Float32Array(n);
+  const tgtX = new Float32Array(n), tgtY = new Float32Array(n);
 
-  const tiltAt = (rowCenter, colCenter) => {
-    cubes.forEach(cube => {
-      const r = +cube.dataset.row;
-      const c = +cube.dataset.col;
-      const dist = Math.hypot(r - rowCenter, c - colCenter);
-      
-      if (dist <= radius) {
-        const pct = 1 - dist / radius;
-        const angle = pct * maxAngle;
-        gsap.to(cube, {
-          duration: 0.25,
-          ease: 'power2.out',
-          overwrite: true,
-          rotateX: -angle,
-          rotateY: angle
-        });
-      } else {
-        gsap.to(cube, {
-          duration: 0.5,
-          ease: 'power2.out',
-          overwrite: true,
-          rotateX: 0,
-          rotateY: 0
-        });
+  // Cache the scene rect; only recomputed on resize/scroll, not per pointer event.
+  let rect = scene.getBoundingClientRect();
+  const remeasure = () => { rect = scene.getBoundingClientRect(); };
+
+  let px = cols / 2, py = rows / 2;      // current (lerped) pointer, in cell units
+  let gx = px, gy = py;                   // goal pointer
+  let userActive = false, idleTimer = null, raf = null;
+  let running = true;
+
+  const setTargets = (cx, cy) => {
+    tgtX.fill(0); tgtY.fill(0);
+    const r0 = Math.max(0, Math.floor(cy - radius)), r1 = Math.min(rows - 1, Math.ceil(cy + radius));
+    const c0 = Math.max(0, Math.floor(cx - radius)), c1 = Math.min(cols - 1, Math.ceil(cx + radius));
+    for (let r = r0; r <= r1; r++) {
+      for (let c = c0; c <= c1; c++) {
+        const d = Math.hypot(r - cy, c - cx);
+        if (d > radius) continue;
+        const a = (1 - d / radius) * maxAngle;
+        const i = r * cols + c;
+        tgtX[i] = -a; tgtY[i] = a;
       }
-    });
+    }
   };
 
-  const resetAll = () => {
-    cubes.forEach(cube => {
-      gsap.to(cube, { duration: 0.5, rotateX: 0, rotateY: 0, ease: 'power2.out' });
-    });
-  };
+  // Adaptive relief for low-end devices: if frames stay long, stop the
+  // always-on idle drift (the single biggest ongoing cost) but keep the effect
+  // fully working for real user input. Never destroys the cubes.
+  let slowFrames = 0, driftEnabled = autoAnimate;
+  let lastT = performance.now();
 
-  const handleMove = (clientX, clientY) => {
+  const render = (now) => {
+    raf = requestAnimationFrame(render);
+    if (!running) return;
+
+    const dt = now - lastT; lastT = now;
+    if (dt > 34) { if (++slowFrames > 45) driftEnabled = false; }
+    else if (slowFrames > 0) slowFrames--;
+
+    px += (gx - px) * 0.18;
+    py += (gy - py) * 0.18;
+
+    if (driftEnabled && !userActive) {
+      if (Math.hypot(gx - px, gy - py) < 0.15) {
+        gx = Math.random() * cols; gy = Math.random() * rows;
+      }
+    }
+    setTargets(px, py);
+
+    // Only cubes that are actually moving get a style write (~30-60 per frame,
+    // not all 576). Everything else is skipped entirely.
+    for (let i = 0; i < n; i++) {
+      const tx = tgtX[i], ty = tgtY[i];
+      let cx = curX[i], cy = curY[i];
+      if (cx === tx && cy === ty) continue;
+      cx += (tx - cx) * 0.2; cy += (ty - cy) * 0.2;
+      if (Math.abs(tx - cx) < 0.05) cx = tx;
+      if (Math.abs(ty - cy) < 0.05) cy = ty;
+      curX[i] = cx; curY[i] = cy;
+      cubes[i].style.transform = `rotateX(${cx.toFixed(2)}deg) rotateY(${cy.toFixed(2)}deg)`;
+    }
+  };
+  raf = requestAnimationFrame(render);
+
+  const onMove = (x, y) => {
     userActive = true;
-    if (idleTimer) clearTimeout(idleTimer);
-
-    const rect = sceneCenter.getBoundingClientRect();
-    // Because cubes are exact pixel dimensions without flex gaps, exact math guarantees perfect tracking
-    const colCenter = (clientX - rect.left) / cubeSize;
-    const rowCenter = (clientY - rect.top) / cubeSize;
-
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => tiltAt(rowCenter, colCenter));
-
-    idleTimer = setTimeout(() => {
-      userActive = false;
-    }, 3000);
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => { userActive = false; }, 2600);
+    gx = (x - rect.left) / cubeSize;
+    gy = (y - rect.top) / cubeSize;
   };
 
-  window.addEventListener('pointermove', e => {
-    handleMove(e.clientX, e.clientY);
-  }, { signal });
-
+  const opts = { signal, passive: true };
+  window.addEventListener('pointermove', e => onMove(e.clientX, e.clientY), opts);
   window.addEventListener('touchmove', e => {
-    if (e.touches && e.touches[0]) {
-      handleMove(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, { passive: true, signal });
-
-  window.addEventListener('touchstart', e => {
-    if (e.touches && e.touches[0]) {
-      userActive = true;
-      handleMove(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, { passive: true, signal });
-
-  window.addEventListener('touchend', resetAll, { signal });
-  window.addEventListener('pointerleave', resetAll, { signal });
+    if (e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
+  }, opts);
+  window.addEventListener('scroll', remeasure, opts);
+  window.addEventListener('resize', () => {
+    clearTimeout(idleTimer);
+    remeasure();
+  }, opts);
 
   if (rippleOnClick) {
-    window.addEventListener('click', e => {
-      const rect = sceneCenter.getBoundingClientRect();
-      const colHit = Math.floor((e.clientX - rect.left) / cubeSize);
-      const rowHit = Math.floor((e.clientY - rect.top) / cubeSize);
-
-      if (colHit < 0 || colHit >= cols || rowHit < 0 || rowHit >= rows) return;
-
-      const rings = {};
-      cubes.forEach(cube => {
-        const r = +cube.dataset.row;
-        const c = +cube.dataset.col;
-        const dist = Math.hypot(r - rowHit, c - colHit);
-        const ring = Math.round(dist);
-        if (!rings[ring]) rings[ring] = [];
-        rings[ring].push(cube);
-      });
-
-      Object.keys(rings).map(Number).sort((a, b) => a - b).forEach(ring => {
-        const delay = (ring * 0.1) / rippleSpeed;
-        const animDuration = 0.25 / rippleSpeed;
-        const holdTime = 0.5 / rippleSpeed;
-        // Optimization: Only target front + side faces, much less DOM load 
-        const faces = rings[ring].flatMap(cube => Array.from(cube.querySelectorAll('.cube-face-el')));
-
-        gsap.to(faces, { backgroundColor: rippleColor, duration: animDuration, delay, ease: 'power2.out' });
-        gsap.to(faces, { backgroundColor: faceColor, duration: animDuration, delay: delay + animDuration + holdTime, ease: 'power2.out' });
-      });
+    // Ripple rings are computed once per click and animated as batched writes,
+    // so GSAP is optional here. Warm the cache in the background.
+    loadGsap();
+    window.addEventListener('click', async e => {
+      const gsap = await loadGsap();
+      if (!gsap) return; // no CDN: skip ripple, tilt keeps working
+      const ch = Math.floor((e.clientX - rect.left) / cubeSize);
+      const rh = Math.floor((e.clientY - rect.top) / cubeSize);
+      if (ch < 0 || ch >= cols || rh < 0 || rh >= rows) return;
+      const maxRing = Math.ceil(Math.hypot(cols, rows));
+      for (let ring = 0; ring <= maxRing; ring++) {
+        const delay = (ring * 0.12) / rippleSpeed;
+        const dur = 0.22 / rippleSpeed;
+        const hold = 0.45 / rippleSpeed;
+        const batch = [];
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            if (Math.round(Math.hypot(r - rh, c - ch)) === ring) batch.push(cubes[r * cols + c]);
+          }
+        }
+        if (!batch.length) continue;
+        gsap.to(batch, { backgroundColor: rippleColor, duration: dur, delay, ease: 'power2.out' });
+        gsap.to(batch, { backgroundColor: faceColor, duration: dur, delay: delay + dur + hold, ease: 'power2.out' });
+      }
     }, { signal });
   }
 
-  if (autoAnimate) {
-    let simPos = { x: Math.random() * cols, y: Math.random() * rows };
-    let simTarget = { x: Math.random() * cols, y: Math.random() * rows };
-    const speed = 0.02;
-    let simRaf = null;
-
-    const loop = () => {
-      if (!userActive) {
-        simPos.x += (simTarget.x - simPos.x) * speed;
-        simPos.y += (simTarget.y - simPos.y) * speed;
-        tiltAt(simPos.y, simPos.x);
-        if (Math.hypot(simPos.x - simTarget.x, simPos.y - simTarget.y) < 0.1) {
-          simTarget = { x: Math.random() * cols, y: Math.random() * rows };
-        }
-      }
-      simRaf = requestAnimationFrame(loop);
-    };
-    simRaf = requestAnimationFrame(loop);
-    
-    abortCtrl.signal.addEventListener('abort', () => cancelAnimationFrame(simRaf));
-  }
-  
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      initCubes(containerEl, options);
-    }, 300);
+  // Stop burning frames when the tab is hidden.
+  document.addEventListener('visibilitychange', () => {
+    running = !document.hidden;
   }, { signal });
+
+  abort.signal.addEventListener('abort', () => {
+    cancelAnimationFrame(raf);
+    clearTimeout(idleTimer);
+  });
 }
