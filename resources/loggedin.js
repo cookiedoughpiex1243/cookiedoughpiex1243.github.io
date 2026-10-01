@@ -1,10 +1,13 @@
 const lock = sessionStorage.getItem("locked");
 const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("loggedIn");
 
-if (loggedIn === lock ) {
+if (loggedIn === lock || (url.pathname === "/echat" && lock != "josh" && lock != "false")) {
   document.body.style = "display: flex";
 }
 else {
+  console.log("User not logged in or session expired. Redirecting to login page.");
+  console.log(lock);
+  console.log(loggedIn);
   document.body.style.visibilty = 'hidden';
   document.body.replaceChildren();
   window.location.replace("login");

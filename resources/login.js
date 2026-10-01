@@ -56,6 +56,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     } console.log(getPublicIP());
   }
   else {
+    sessionStorage.setItem("locked", window.user2LowerName);
     setTimeout (() => {
     window.location.href = "echat";}, 250);
     document.addEventListener("pagehide", () => {

@@ -7,12 +7,13 @@
     <title>Pinterest...</title>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="resources/chat.js" defer></script>
-    <script src="resources/loggedin.js" defer></script>
     <script>
-        sessionStorage.setItem("user", window.user2Name.toLowerCase());
+        sessionStorage.setItem("user", window.user2LowerName);
         sessionStorage.setItem("site", "echat");
-        sessionStorage.setItem("locked", window.user2Name.toLowerCase());
+        sessionStorage.setItem("locked", window.user2LowerName);
+        console.log(sesionStorage.getItem("locked"));
     </script>
+<script src="resources/loggedin.js" defer></script>
     <link rel="stylesheet" href="resources/style.css">
     <link rel="icon" type="image/x-icon" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIKj0jHE8aYwpvb-CsP4R8OxHYlyGC9OpBAw&s">
 </head>
