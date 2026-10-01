@@ -1,7 +1,7 @@
 const lock = sessionStorage.getItem("locked");
 const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("loggedIn");
 
-if (loggedIn === lock || (url.pathname === "/echat" && lock != "josh" && lock != "false")) {
+if (loggedIn === lock || (window.location.pathname == "/echat" && lock != "josh" && lock != "false")) {
   document.body.style = "display: flex";
 }
 else {
