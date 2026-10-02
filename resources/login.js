@@ -53,7 +53,7 @@ document.getElementById('loginbtn').addEventListener('click', async function () 
     document.addEventListener("pagehide", () => {
       message.innerText = "";
     })}, 250);
-    } console.log(getPublicIP());
+    } 
   }
   else {
     sessionStorage.setItem("locked", window.user2LowerName);
