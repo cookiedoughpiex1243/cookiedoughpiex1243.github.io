@@ -1,5 +1,4 @@
 const lock = sessionStorage.getItem("locked");
-<<<<<<< HEAD
 const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("loggedIn");
 
 if (loggedIn === lock || (window.location.pathname == "/echat" && lock != "josh" && lock != "false")) {
@@ -9,7 +8,6 @@ const loggedIn = sessionStorage.getItem("loggedIn") ? sessionStorage.getItem('lo
 const currentSite = sessionStorage.getItem("site");
 if ((loggedIn === lock || (currentSite === "echat" && lock != "josh" && lock != "false")) && loggedIn != "unauthorized" && loggedIn != "undefined") {
   document.body.style = "display: flex"; (console.log("Logged in! (" + loggedIn + ")"));
->>>>>>> dev-frontend-branch
 }
 else {
   console.log("User not logged in or session expired. Redirecting to login page.");
