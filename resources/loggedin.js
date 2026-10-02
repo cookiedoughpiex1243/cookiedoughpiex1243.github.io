@@ -3,7 +3,6 @@ const loggedIn = sessionStorage.getItem("loggedIn") || localStorage.getItem("log
 
 if (loggedIn === lock || (window.location.pathname == "/echat" && lock != "josh" && lock != "false")) {
   document.body.style = "display: flex";
-=======
 const loggedIn = sessionStorage.getItem("loggedIn") ? sessionStorage.getItem('loggedIn') : "unauthorized" || localStorage.getItem("loggedIn");
 const currentSite = sessionStorage.getItem("site");
 if ((loggedIn === lock || (currentSite === "echat" && lock != "josh" && lock != "false")) && loggedIn != "unauthorized" && loggedIn != "undefined") {
