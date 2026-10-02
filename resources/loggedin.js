@@ -39,4 +39,4 @@ document.addEventListener('click', function(e) {
     sessionStorage.setItem('site', 'login');
     sessionStorage.setItem("locked", "false");
     window.location.replace("login");
-  }});
+  }})
