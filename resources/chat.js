@@ -289,7 +289,14 @@ function updateNewMsgBadge() {
     if (!newMsgBadge) {
         newMsgBadge = document.createElement('div');
         newMsgBadge.style.cssText = 'position:fixed;bottom:80px;right:71px;background:#00ffff;color:#0b0c10;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:bold;z-index:1000;box-shadow:0 2px 12px rgba(0,255,255,0.4);';
-        newMsgBadge.addEventListener('click', () => { wrapper.scrollTop = wrapper.scrollHeight; });
+        newMsgBadge.addEventListener('click', () => { 
+            console.log("Badge clicked, calling loadNewerMessages and scrolling");
+            loadNewerMessages().then(() => {
+                wrapper.scrollTop = wrapper.scrollHeight;
+            });
+            pendingLiveMsgCount = 0;
+            updateNewMsgBadge();
+        });
         document.body.appendChild(newMsgBadge);
     }
     if (pendingLiveMsgCount > 0) {
@@ -623,7 +630,8 @@ async function loadHistory() {
             : true;
         
         // --- Many-unread case: lastRead is older than the initial batch ---
-        if (chatType === 'private' && myLastReadID && !lastReadInBatch && batchFull) {
+        const oldestInBatch = newestMessages[0]?.id;
+        if (chatType === 'private' && myLastReadID && !lastReadInBatch && batchFull && oldestInBatch && Number(myLastReadID) >= oldestInBatch) {
             // Fetch context (10 msgs ending at lastRead) + unread (LOAD_LIMIT msgs after lastRead) in parallel
             const [contextRes, unreadRes] = await Promise.all([
                 fetch(`${CLOUD_URL}/${endpoint}?before=${Number(myLastReadID) + 1}&limit=10`),
@@ -691,7 +699,7 @@ async function loadHistory() {
         
         // Scroll to first unread, or bottom
         let scrollTarget = null;
-        if (myLastReadID && chatType === "private") {
+        if (myLastReadID && chatType === "private" && lastReadInBatch) {
             const allBoxes = wrapper.querySelectorAll('.messageBox');
             for (const box of allBoxes) {
                 const msgId = Number(box.getAttribute('msg-id'));
